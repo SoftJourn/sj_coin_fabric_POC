@@ -1,0 +1,29 @@
+<div style="text-align:center">
+  <h3>
+    {{title}}
+  </h3>
+</div>
+
+<div>
+  <h4>Users</h4>
+  <form [formGroup]="userForm" (ngSubmit)="enrollUser(userForm.value)" class="ui form">
+    <input type="text" placeholder="User Name" [ngModel]="username" [formControl]="userForm.get('username')">
+    <input type="text" placeholder="Organization Name" [ngModel]="orgName" [formControl]="userForm.get('orgName')">
+
+    <div *ngIf="!userForm.valid"
+         class="ui error message">Form is invalid</div>
+    <button type="submit" class="ui button">Enroll User</button>
+  </form>
+
+  <div style="padding: 5px 0">
+    <textarea name="userData" [ngModel]="data.user.lastResult" cols="60" rows="4"></textarea>
+  </div>
+</div>
+
+<app-channel></app-channel>
+<app-chaincode></app-chaincode>
+<div style="display: inline-flex; padding: 5px;">
+  <app-mint></app-mint>
+  <app-balance></app-balance>
+  <app-transfer></app-transfer>
+</div>

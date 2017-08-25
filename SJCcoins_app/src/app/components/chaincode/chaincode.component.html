@@ -1,0 +1,44 @@
+<h4>Chaincode</h4>
+<div>
+  <form [formGroup]="chaincodeForm" (ngSubmit)="deployChaincode(chaincodeForm.value)" class="ui form">
+    <input type="text" placeholder="Chaincode Name" [(ngModel)]="this.data.chaincode.chaincodeName"
+           [formControl]="chaincodeForm.get('chaincodeName')">
+    <input type="text" placeholder="Chaincode Path" [(ngModel)]="this.data.chaincode.chaincodePath"
+           [formControl]="chaincodeForm.get('chaincodePath')">
+    <input type="text" placeholder="Chaincode Version" [(ngModel)]="this.data.chaincode.chaincodeVersion"
+           [formControl]="chaincodeForm.get('chaincodeVersion')">
+    <div>
+      <textarea name="chaincodeArgs" placeholder="Arguments" [(ngModel)]="this.data.chaincode.chaincodeArgs"
+                [formControl]="chaincodeForm.get('chaincodeArgs')" cols="60" rows="4"></textarea>
+
+    </div>
+    <div *ngIf="!chaincodeForm.valid"
+         class="ui error message">Form is invalid</div>
+    <div>
+      <button type="submit" class="ui button">Deploy Chaincode</button>
+    </div>
+  </form>
+  <div style="padding: 5px 0">
+    <button (click)="initializeChaincode()">Initialize Chaincode</button>
+    <button (click)="upgradeChaincode()">Upgrade Chaincode</button>
+  </div>
+
+  <form [formGroup]="chaincodeInvokeForm" (ngSubmit)="invokeChaincode(chaincodeInvokeForm.value)" class="ui form">
+    <textarea name="chaincodeInvokeArgs" placeholder="Chaincode Invoke Arguments" [ngModel]="chaincodeInvokeArgs"
+              [formControl]="chaincodeInvokeForm.get('chaincodeInvokeArgs')" cols="60" rows="4"></textarea>
+
+    <div *ngIf="!chaincodeInvokeForm.valid"
+         class="ui error message">Form is invalid</div>
+    <div>
+      <button type="submit" class="ui button">Invoke Chaincode</button>
+    </div>
+  </form>
+
+
+
+
+  <div style="padding: 5px 0">
+    <textarea name="userData" [ngModel]="data.chaincode.lastResult" cols="60" rows="4"></textarea>
+  </div>
+
+</div>
