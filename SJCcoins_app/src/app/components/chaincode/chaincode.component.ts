@@ -18,8 +18,8 @@ export class ChaincodeComponent implements OnInit {
 
   public chaincodeName: string = "foundation";
   public chaincodePath: string = "github.com/foundation";
-  //                                                  admin account                                                       foundation account
-  public chaincodeArgs: string = "9fbf3c83e42e2ce5ed7b1a8755b2b881b24871023e2c38242f78693985f30546, 4e923c618bac62daeab4651c8e82d9c26e674f5cb9faf9eb0ef120a8ba00cba5, " +
+  //                   foundation name                          admin account                                                       foundation account
+  public chaincodeArgs: string = "foundation, 9fbf3c83e42e2ce5ed7b1a8755b2b881b24871023e2c38242f78693985f30546, 4e923c618bac62daeab4651c8e82d9c26e674f5cb9faf9eb0ef120a8ba00cba5, " +
     // Goal Minutes Close Main [Colors]
       "500, 1000, true, coin, coin";
 

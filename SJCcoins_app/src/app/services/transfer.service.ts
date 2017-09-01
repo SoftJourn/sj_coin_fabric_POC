@@ -24,7 +24,7 @@ export class TransferService {
     let argsObject = {
       fcn: "transfer",
       peers:  ["localhost:7051","localhost:7056"],
-      args: [dataObject.transferTo, dataObject.amount.toString()]
+      args: ["user_", dataObject.transferTo, dataObject.amount.toString()]
     };
 
     let url = environment.apiUrl + 'channels/' + this.data.channel.currentChannel + '/chaincodes/' + this.data.chaincode.chaincodeName;
