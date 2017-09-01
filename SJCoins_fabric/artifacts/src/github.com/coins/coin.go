@@ -85,13 +85,6 @@ func (t *CoinChain) Init(stub shim.ChaincodeStubInterface) pb.Response  {
 		t.saveMap(stub, balancesKey, balancesMap);
 	}
 
-	//allowedMap := t.getMap(stub, allowed)
-	//logger.Info("currentallowedMap ", allowedMap)
-	//if len(allowedMap) == 0 {
-	//	allowedMap = map[string]uint{}
-	//	t.saveMap(stub, allowed, allowedMap)
-	//}
-
 	return shim.Success([]byte(currencyName))
 }
 
@@ -111,20 +104,10 @@ func (t *CoinChain) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.mint(stub, args)
 	} else if function == "transfer" {
 		return t.transfer(stub, args)
-	//} else if function == "transferFrom" {
-	//	return t.transferFrom(stub, args)
 	} else if function == "balanceOf" {
 		return t.balanceOf(stub, args)
-	//} else if function == "approve" {
-	//	return t.approve(stub, args)
-	//} else if function == "approveAndCall" {
-	//	return t.approveAndCall(stub, args)
-	//} else if function == "allowance" {
-	//	return t.allowance(stub, args)
 	} else if function == "distribute" {
 		return t.distribute(stub, args)
-	//} else if function == "convert" {
-	//	return t.convert(stub, args)
 	} else if function == "withdrawFromFoundation" {
 		return t.withdrawFromFoundation(stub, args)
 	}
@@ -181,108 +164,6 @@ func (t *CoinChain) transfer(stub shim.ChaincodeStubInterface, args []string) pb
 
 	return shim.Success([]byte(strconv.FormatUint(uint64(balancesMap[receiverAccount]), 10)))
 }
-
-//func (t *CoinChain) transferFrom(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//
-//	if len(args) != 3 {
-//		return shim.Error("Incorrect number of arguments. Expecting 3")
-//	}
-//
-//	var from string = args[0]
-//	var to string = args[1]
-//	amount := t.parseAmountUint(args[2])
-//	if (amount == 0) {
-//		return shim.Error("Incorrect amount")
-//	}
-//
-//	balancesMap := t.getMap(stub, balances)
-//	allowedMap := t.getMap(stub, allowed)
-//
-//	checkAllowedKey, err := stub.CreateCompositeKey(allowed, []string{from, to} )
-//	if err != nil {
-//		return shim.Error(err.Error())
-//	}
-//
-//	if balancesMap[from] >= amount && allowedMap[checkAllowedKey] >= amount && amount > 0 {
-//		balancesMap[from] -= amount
-//		balancesMap[to] += amount
-//		allowedMap[checkAllowedKey] -= amount
-//		t.saveMap(stub, balances, balancesMap)
-//		t.saveMap(stub, allowed, allowedMap)
-//		//TODO transfer event
-//		return shim.Success(nil)
-//	}
-//	return shim.Error("trnasfer Failed")
-//}
-
-//func (t *CoinChain) approve(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//
-//	if len(args) != 2 {
-//		return shim.Error("Incorrect number of arguments. Expecting 2")
-//	}
-//
-//	spender := args[0]
-//	amount := t.parseAmountUint(args[1])
-//	if (amount == 0) {
-//		return shim.Error("Incorrect amount")
-//	}
-//
-//	sender := t.getCurrentUser(stub)
-//
-//	allowedKey, err :=stub.CreateCompositeKey("allowed", []string{sender.StringValue, spender} )
-//	if err != nil {
-//		return shim.Error(err.Error())
-//	}
-//	allowedMap := t.getMap(stub, allowed)
-//	allowedMap[allowedKey] += amount
-//	t.saveMap(stub, allowed, allowedMap)
-//
-//	//TODO event
-//	//	Approval(msg.sender, spender, amount);
-//
-//	return shim.Success(nil)
-//}
-
-//func (t *CoinChain) approveAndCall(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//
-//	if len(args) != 2 {
-//		return shim.Error("Incorrect number of arguments. Expecting 2")
-//	}
-//
-//	spender := args[0]
-//	amount := t.parseAmountUint(args[1])
-//	if (amount == 0) {
-//		return shim.Error("Incorrect amount")
-//	}
-//
-//	sender := t.getCurrentUser(stub)
-//
-//	allowedKey, err :=stub.CreateCompositeKey("allowed", []string{sender.StringValue, spender} )
-//	if err != nil {
-//		return shim.Error(err.Error())
-//	}
-//	allowedMap := t.getMap(stub, allowed)
-//	allowedMap[allowedKey] += amount
-//	t.saveMap(stub, allowed, allowedMap)
-//
-//	//TODO event
-//	//	Approval(msg.sender, spender, amount);
-//
-//	function := "receiveApproval"
-//	queryArgs := util.ToChaincodeArgs(function, "params")
-//	t.callChaincode(stub, "foundation", queryArgs)
-//	return shim.Success(nil)
-//}
-
-//func (t *CoinChain) callChaincode(stub shim.ChaincodeStubInterface, chaincodeName string, queryArgs [][]byte) pb.Response {
-//
-//	response := stub.InvokeChaincode(chaincodeName, queryArgs, channel)
-//	if response.Status == shim.OK {
-//		return shim.Success(nil)
-//	} else {
-//		return shim.Error("Failed to call chaincode")
-//	}
-//}
 
 func (t *CoinChain) setCurrency(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 1 {
@@ -456,7 +337,6 @@ func (t *CoinChain) getCreatorHash(stub shim.ChaincodeStubInterface) ([]byte, er
 }
 
 func (t *CoinChain) hashCreator(stub shim.ChaincodeStubInterface) ([]byte, error) {
-	//logger.Info("########### Coin hashCreator ###########")
 	creatorBytes, err := stub.GetCreator()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get creator")
@@ -491,79 +371,6 @@ func (t *CoinChain) balanceOf(stub shim.ChaincodeStubInterface, args []string) p
 	balancesMap := t.getMap(stub, balancesKey)
 	return shim.Success([]byte(fmt.Sprintf("%d", balancesMap[account])))
 }
-
-//func (t *CoinChain) allowance(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//	if len(args) != 2 {
-//		return shim.Error("Incorrect number of arguments. Expecting 2")
-//	}
-//
-//	sender := args[0]
-//	spender := args[1]
-//	allowedMap := t.getMap(stub, allowed)
-//
-//	allowedKey, err :=stub.CreateCompositeKey(allowed, []string{sender, spender} )
-//	if err != nil {
-//		return shim.Error(err.Error())
-//	}
-//	return shim.Success([]byte(fmt.Sprintf("%d", allowedMap[allowedKey])))
-//}
-
-//func (t *CoinChain) convert(stub shim.ChaincodeStubInterface, args []string ) pb.Response {
-//
-//	currency := args[0]
-//	logger.Info("currency : ", currency)
-//	account := args[1]
-//	logger.Info("account : ", account)
-//	amount := t.parseAmountUint(args[2])
-//	logger.Info("args[2] : ", args[2])
-//	logger.Info("amount : ", amount)
-//
-//	if (amount == 0) {
-//		return shim.Error("Error. Amount must be > 0")
-//	}
-//
-//	queryArgs := util.ToChaincodeArgs("withdraw", account, args[2])
-//	response := stub.InvokeChaincode(currency, queryArgs, channel)
-//	logger.Info("Withdraw Result status : ", response.Status)
-//
-//	if (response.Status == shim.OK){
-//		balancesMap := t.getMap(stub, balances)
-//		logger.Info("balancesMap[minterAccount] : ",  balancesMap[minterAccount])
-//		logger.Info("amount : ", amount)
-//		if (balancesMap[minterAccount] < amount) {
-//			return shim.Error("Failed convert. Minter has no money")
-//		}
-//		balancesMap[account] += amount
-//		balancesMap[minterAccount] -= amount
-//		t.saveMap(stub, balances, balancesMap)
-//		logger.Info("Convert success : ", amount)
-//		return shim.Success(nil)
-//	} else {
-//		logger.Info("Convert failed : ", amount)
-//		return shim.Error(response.Message)
-//	}
-//
-//	return shim.Success(nil)
-//}
-
-//func (t *CoinChain) withdraw(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//
-//	account := args[0]
-//	amount := t.parseAmountUint(args[1])
-//
-//	balancesMap := t.getMap(stub, balances)
-//
-//	if balancesMap[account] < amount {
-//		logger.Error("Withdaraw failed ", amount)
-//		return shim.Error("Failed withdraw: Not enough funds")
-//	} else {
-//		balancesMap[account] -= amount
-//		balancesMap[minterAccount] += amount
-//		t.saveMap(stub, balances, balancesMap)
-//		logger.Info("Withdraw success ", amount)
-//		return shim.Success(nil)
-//	}
-//}
 
 func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 

@@ -62,9 +62,6 @@ var isContractClosed bool = false
 /*donations returned */
 var isDonationReturned bool = false
 
-///*donations converted */
-//var isDonationConverted bool = false
-
 var channel string = "mychannel"
 
 var foundationAccountType string = "foundation_"
@@ -171,10 +168,6 @@ func (t *FoundationChain) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.closeFoundation(stub, args)
 	} else if function == "isWithdrawAllowed" {
 		return t.isWithdrawAllowed(stub, args)
-	//} else if function == "convertToMainCurrency" {
-	//	return t.convertToMainCurrency(stub, args)
-	//} else if function == "sendToFoundation" {
-	//	return t.sendToFoundation(stub, args)
 	}
 
 	return shim.Error("Invalid invoke function name.")
@@ -315,104 +308,6 @@ func (t *FoundationChain) isWithdrawAllowed(stub shim.ChaincodeStubInterface, ar
 	}
 	return shim.Success([]byte(strconv.FormatBool(result)))
 }
-
-
-
-//func (t *FoundationChain) convertToMainCurrency(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//
-//	if (!isContractClosed) {
-//		return shim.Error("Failed. Please close donations before conversion.")
-//	}
-//
-//	if isDonationConverted {
-//		return shim.Error("Failed. Donations are already converted.")
-//	}
-//
-//	donationsMap := getMap(stub, donations)
-//	for k, v := range donationsMap {
-//		if v > 0 {
-//			currency, parts, err := stub.SplitCompositeKey(k)
-//			logger.Info("Key : ", k)
-//			logger.Info("currency: ", currency)
-//			logger.Info("parts: ", parts)
-//			logger.Info("--- amount value v: ", v)
-//
-//			if err != nil {
-//				return shim.Error(err.Error())
-//			}
-//
-//			if parts[0] != mainCurrency {
-//
-//				queryArgs := util.ToChaincodeArgs("convert", currency, adminAccount, strconv.FormatUint(uint64(v), 10))
-//				response := stub.InvokeChaincode(mainCurrency, queryArgs, channel)
-//				logger.Info("Result ", response.Status)
-//
-//				if (response.Status == shim.OK){
-//
-//				} else {
-//					return shim.Error(response.Message)
-//				}
-//			}
-//
-//		}
-//	}
-//	saveMap(stub, donations, donationsMap)
-//	isDonationConverted = true
-//	return shim.Success(nil)
-//}
-
-//func (t *FoundationChain) sendToFoundation(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-//
-//	currentUser := t.getCurrentUser(stub)
-//	if (currentUser.StringValue != adminAccount) {
-//		return shim.Error( "Failed. Only admin can spend funds" )
-//	}
-//	if !fundingGoalReached {
-//		return shim.Error("Failed. Funding goal in not reached.")
-//	}
-//	if !isContractClosed {
-//		return shim.Error("Failed. Please close donations.")
-//	}
-//	if len(acceptCurrencies) != 1 && !isDonationConverted {
-//		return shim.Error("Failed. Please convert funds to main currency.")
-//	}
-//
-//	logger.Info("args[0] amount ", args[0])
-//	amount := t.parseAmountUint(args[0])
-//	logger.Info("amount ", amount)
-//	note := args[1]
-//	logger.Info("note ", note)
-//
-//	if amount <= collectedAmount {
-//		queryArgs := util.ToChaincodeArgs("transfer", userAccountType, creatorAccount, args[0])
-//		response := stub.InvokeChaincode(mainCurrency, queryArgs, channel)
-//		logger.Info("Result ", response.Status)
-//
-//		if response.Status == shim.OK {
-//			collectedAmount -= amount
-//
-//			detailMap, err := getDetails(stub)
-//			if err != nil {
-//				return shim.Error(err.Error())
-//			}
-//
-//			key, err := stub.CreateCompositeKey("_", []string{strconv.Itoa(len(detailMap) + 1), time.Now().String(), args[0] })
-//			if err != nil {
-//				return shim.Error(err.Error())
-//			}
-//
-//			detailMap[key] = note
-//			saveDetails(stub, detailMap)
-//
-//			return shim.Success([]byte(strconv.FormatUint(uint64(collectedAmount), 10)))
-//		} else {
-//			return shim.Error(response.Message)
-//		}
-//
-//	} else {
-//		return shim.Error("Failed. Not enough funds.")
-//	}
-//}
 
 func (t *FoundationChain) parseAmountUint(amount string) uint {
 	amount32, err := strconv.ParseUint(amount, 10, 32)
