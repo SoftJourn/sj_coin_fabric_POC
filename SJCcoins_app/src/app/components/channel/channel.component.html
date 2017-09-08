@@ -1,8 +1,12 @@
 <h4>Channels</h4>
 <div>
+  <input type="text" placeholder="Chaincode Name" [(ngModel)]="this.data.channel.peers"
+  style="width: 300px;">
+</div>
+<div>
   <button (click)="getChannels()">Get Channels</button>
   <button (click)="createChannel()">Create Channel</button>
-  <button (click)="connectToChannel()">Connect to Channel</button>
+  <button (click)="joinChannel()">Connect to Channel</button>
 </div>
 
 <div style="padding: 5px 0">

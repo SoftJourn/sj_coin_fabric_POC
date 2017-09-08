@@ -9,7 +9,7 @@ import {ChannelService} from "../../services/channel.service";
 })
 export class ChannelComponent implements OnInit {
 
-  constructor(private data:DataService, private channelService:ChannelService) { }
+  constructor(public data:DataService, private channelService:ChannelService) { }
 
   public isEnabled:boolean = false;
 
@@ -37,7 +37,7 @@ export class ChannelComponent implements OnInit {
     }
   }
 
-  connectToChannel() {
+  joinChannel() {
     if (this.data.channel.isConnected) {
       console.log("already connected")
     }

@@ -23,7 +23,7 @@ export class ChaincodeComponent implements OnInit {
     // Goal Minutes Close Main [Colors]
       "500, 1000, true, coin, coin";
 
-  public chaincodeInvokeArgs: string = '{"peers": ["localhost:7051", "localhost:7056"],"fcn":"donate","args":[ "coin", "1000000"]}';
+  public chaincodeInvokeArgs: string = '{"peers": ["localhost:7051", "localhost:7056"],"fcn":"donate","args":[ "coin", "10"]}';
 
 
   chaincodeForm: FormGroup;

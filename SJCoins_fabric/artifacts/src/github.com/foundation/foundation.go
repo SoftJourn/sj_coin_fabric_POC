@@ -18,10 +18,10 @@ type FoundationChain struct {
 }
 
 type Detail struct {
-	amount uint
-	id uint
-	time time.Time
-	note string
+	Amount uint
+	Id uint
+	Time time.Time
+	Note string
 }
 
 /*Contract's founder address*/
@@ -62,7 +62,7 @@ var isContractClosed bool = false
 /*donations returned */
 var isDonationReturned bool = false
 
-var channel string = "mychannel"
+var channelName string = "mychannel"
 
 var foundationAccountType string = "foundation_"
 var userAccountType string = "user_"
@@ -150,7 +150,7 @@ func (t *FoundationChain) Init(stub shim.ChaincodeStubInterface) pb.Response  {
 //	}
 
 	detailsMap, _ := getDetails(stub)
-	detailsMap = make(map[string]string)
+	detailsMap = make(map[int]Detail)
 	saveDetails(stub, detailsMap)
 
 	logger.Info("acceptCurrencies ", acceptCurrencies)
@@ -203,10 +203,10 @@ func (t *FoundationChain) donate(stub shim.ChaincodeStubInterface, args []string
 	}
 
 	queryArgs := util.ToChaincodeArgs("transfer", foundationAccountType, foundationName, args[1])
-	response := stub.InvokeChaincode(currency, queryArgs, channel)
+	response := stub.InvokeChaincode(currency, queryArgs, channelName)
 	logger.Info("Result ", response.Status)
 
-	if (response.Status == shim.OK){
+	if (response.Status == shim.OK) {
 
 		currentUser := t.getCurrentUser(stub)
 		logger.Info(currentUser)
@@ -262,8 +262,8 @@ func (t *FoundationChain) closeFoundation(stub shim.ChaincodeStubInterface, args
 						return shim.Error(err.Error())
 					}
 
-					queryArgs := util.ToChaincodeArgs("transfer", parts[0], strconv.FormatUint(uint64(v), 10))
-					response := stub.InvokeChaincode(currency, queryArgs, channel)
+					queryArgs := util.ToChaincodeArgs("transfer", userAccountType, parts[0], strconv.FormatUint(uint64(v), 10))
+					response := stub.InvokeChaincode(currency, queryArgs, channelName)
 					logger.Info("Result ", response.Status)
 
 					if (response.Status == shim.OK){
@@ -293,6 +293,7 @@ func checkGoalReached() bool {
 
 	if closeOnGoalReached {
 		if collectedAmount >= fundingGoal || time.Now().After(deadline) {
+			contractRemains = collectedAmount
 			isContractClosed = true
 		}
 	}
@@ -300,12 +301,32 @@ func checkGoalReached() bool {
 }
 
 func (t *FoundationChain) isWithdrawAllowed(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	logger.Info("    ---- invoked isWithdrawAllowed")
+
+	amount := t.parseAmountUint(args[0])
+	note := args[1]
+	logger.Info("amount: ", amount)
+	logger.Info("note: ", note)
+	logger.Info("contractRemains: ", contractRemains)
+
 	result := false
 	currentUser := t.getCurrentUser(stub)
 
-	if (currentUser.StringValue == adminAccount && isContractClosed) {
+	if (currentUser.StringValue == adminAccount && isContractClosed && amount <= contractRemains) {
+		contractRemains -= amount
+		detailsMap, err := getDetails(stub)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		newDetail := Detail{Time:time.Now(), Amount:amount, Note:note, Id: uint(len(detailsMap) + 1)}
+		detailsMap[len(detailsMap) + 1] = newDetail
+		saveDetails(stub, detailsMap)
+		logger.Info("detailsMap: ", detailsMap)
+
 		result = true
 	}
+	logger.Info("    ---- isWithdrawAllowed result", result)
 	return shim.Success([]byte(strconv.FormatBool(result)))
 }
 
@@ -354,7 +375,7 @@ func saveMap(stub shim.ChaincodeStubInterface, mapName string, mapObject map[str
 
 var details string = "details"
 
-func getDetails(stub shim.ChaincodeStubInterface) (map[string]string, error) {
+func getDetails(stub shim.ChaincodeStubInterface) (map[int]Detail, error) {
 
 	logger.Info("------ getDetails called")
 	mapBytes, err := stub.GetState(details)
@@ -363,7 +384,7 @@ func getDetails(stub shim.ChaincodeStubInterface) (map[string]string, error) {
 		return nil, err
 	}
 
-	var mapObject map[string]string
+	var mapObject map[int]Detail
 	err = json.Unmarshal(mapBytes, &mapObject)
 	if err != nil {
 		return nil, err
@@ -372,7 +393,7 @@ func getDetails(stub shim.ChaincodeStubInterface) (map[string]string, error) {
 	return mapObject, nil
 }
 
-func saveDetails(stub shim.ChaincodeStubInterface, mapObject map[string]string) pb.Response {
+func saveDetails(stub shim.ChaincodeStubInterface, mapObject map[int]Detail) pb.Response {
 	logger.Info("------ saveDetails called")
 
 	mapBytes, err := json.Marshal(mapObject)

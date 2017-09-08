@@ -24,8 +24,6 @@ var currencyName string
 
 var minterKey string = "minter"
 var balancesKey string = "balances"
-//var allowed string = "allowed"
-
 var currencyKey string = "currency"
 
 var channelName string = "mychannel"
@@ -374,13 +372,20 @@ func (t *CoinChain) balanceOf(stub shim.ChaincodeStubInterface, args []string) p
 
 func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
-	if len(args) != 3 {
-		return shim.Error("Incorrect number of arguments. Expecting 3")
+	if len(args) != 4 {
+		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 
 	foundationName := args[0]
 	receiver := args[1]
-	queryArgs := util.ToChaincodeArgs("isWithdrawAllowed")
+
+	logger.Info("withdrawFromFoundation foundationName", foundationName)
+	logger.Info("withdrawFromFoundation receiver", receiver)
+	logger.Info("withdrawFromFoundation amount", args[2])
+	logger.Info("withdrawFromFoundation note", args[3])
+
+	queryArgs := util.ToChaincodeArgs("isWithdrawAllowed", args[2], args[3])
+	logger.Info("queryArgs: ", queryArgs)
 	response := stub.InvokeChaincode(foundationName, queryArgs, channelName)
 
 	logger.Info("isWithdrawAllowed response", response)
@@ -417,7 +422,9 @@ func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, arg
 			balancesMap[receiverAccount] += amount
 			t.saveMap(stub, balancesKey, balancesMap)
 			logger.Info("Withdraw success ", amount)
-			return shim.Success([]byte(strconv.FormatUint(uint64(balancesMap[foundationAccount]), 10)))
+			logger.Info("foundationAccount ", balancesMap[foundationAccount])
+			return shim.Success([]byte(strconv.FormatBool(true)))
+			//return shim.Success([]byte(strconv.FormatUint(uint64(balancesMap[foundationAccount]), 10)))
 		}
 
 

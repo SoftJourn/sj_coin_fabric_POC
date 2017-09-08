@@ -72,7 +72,7 @@ export class ChannelService {
 
     let url = environment.apiUrl + 'channels/mychannel/peers';
 
-    this.http.post(url, JSON.stringify({peers: ["localhost:7051","localhost:7056"]}), opts)
+    this.http.post(url, JSON.stringify({peers: this.data.channel.peers.split(", ")}), opts)
       .subscribe((res: Response) => {
         let json = res.json();
         console.log(json);
