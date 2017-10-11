@@ -1,0 +1,35 @@
+{{define "title"}}Log in{{end}}
+{{define "body"}}
+<h2>CA Service</h2>
+<h5>Please enter your LDAP credentials to receive certificate</h5>
+
+{{ if .Response.IsResponse }}
+    {{ if .Response.Success }}
+    <div class="alert alert-success" role="alert">
+        Successful request
+    </div>
+    {{ else }}
+        {{if .Response.Error}}
+            <div class="alert alert-danger" role="alert">
+                {{.Response.Error}}
+            </div>
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+<form action="login.html" method="post">
+    <div class="form-group">
+        <label for="Username">Username</label>
+        <input type="text" class="form-control" id="Username" placeholder="Username" name="Username" value="{{.Username}}">
+    </div>
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input type="password" class="form-control" id="Password" placeholder="Password" name="Password" value="{{.Password}}">
+    </div>
+    <input type="hidden" name="submitted" value="true">
+    <div>
+        <button type="submit" class="btn btn-default">Log in</button>
+    </div>
+</form>
+
+{{end}}
