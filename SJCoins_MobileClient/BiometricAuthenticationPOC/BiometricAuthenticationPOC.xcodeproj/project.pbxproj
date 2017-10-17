@@ -19,6 +19,13 @@
 		355B17781F9105C100EC63A7 /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355B17771F9105C100EC63A7 /* Const.swift */; };
 		355B177A1F91070D00EC63A7 /* StoryboardIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355B17791F91070D00EC63A7 /* StoryboardIdentifiable.swift */; };
 		35C671951F963B2B0051F538 /* InitialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C671941F963B2B0051F538 /* InitialViewController.swift */; };
+		35C671971F96400C0051F538 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C671961F96400C0051F538 /* SignUpViewController.swift */; };
+		35C671991F96401F0051F538 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C671981F96401F0051F538 /* SignInViewController.swift */; };
+		35C6719B1F9648BB0051F538 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C6719A1F9648BB0051F538 /* Navigator.swift */; };
+		35C6719D1F9649360051F538 /* Interactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C6719C1F9649360051F538 /* Interactor.swift */; };
+		35C6719F1F9649850051F538 /* InteractionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C6719E1F9649850051F538 /* InteractionDelegate.swift */; };
+		35C671A11F964F360051F538 /* UIStoryboard+Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C671A01F964F360051F538 /* UIStoryboard+Name.swift */; };
+		35C671A31F964FC50051F538 /* UIViewController+StoryboardIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C671A21F964FC50051F538 /* UIViewController+StoryboardIdentifiable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +43,13 @@
 		355B17771F9105C100EC63A7 /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		355B17791F91070D00EC63A7 /* StoryboardIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardIdentifiable.swift; sourceTree = "<group>"; };
 		35C671941F963B2B0051F538 /* InitialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialViewController.swift; sourceTree = "<group>"; };
+		35C671961F96400C0051F538 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
+		35C671981F96401F0051F538 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		35C6719A1F9648BB0051F538 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		35C6719C1F9649360051F538 /* Interactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interactor.swift; sourceTree = "<group>"; };
+		35C6719E1F9649850051F538 /* InteractionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionDelegate.swift; sourceTree = "<group>"; };
+		35C671A01F964F360051F538 /* UIStoryboard+Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStoryboard+Name.swift"; sourceTree = "<group>"; };
+		35C671A21F964FC50051F538 /* UIViewController+StoryboardIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+StoryboardIdentifiable.swift"; sourceTree = "<group>"; };
 		777FF58233BF692F873F37CC /* Pods_BiometricAuthenticationPOC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BiometricAuthenticationPOC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA6878A15D8F833DEDDE6E6B /* Pods-BiometricAuthenticationPOC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiometricAuthenticationPOC.release.xcconfig"; path = "Pods/Target Support Files/Pods-BiometricAuthenticationPOC/Pods-BiometricAuthenticationPOC.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +104,8 @@
 				355B17691F90F4FA00EC63A7 /* Extensions */,
 				355B17521F90F3FC00EC63A7 /* ViewController.swift */,
 				35C671941F963B2B0051F538 /* InitialViewController.swift */,
+				35C671961F96400C0051F538 /* SignUpViewController.swift */,
+				35C671981F96401F0051F538 /* SignInViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -131,6 +147,8 @@
 		355B17661F90F49300EC63A7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				35C6719A1F9648BB0051F538 /* Navigator.swift */,
+				35C6719C1F9649360051F538 /* Interactor.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -146,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				355B17791F91070D00EC63A7 /* StoryboardIdentifiable.swift */,
+				35C6719E1F9649850051F538 /* InteractionDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -153,6 +172,7 @@
 		355B17691F90F4FA00EC63A7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				35C671A21F964FC50051F538 /* UIViewController+StoryboardIdentifiable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -190,6 +210,7 @@
 		355B176E1F90F52000EC63A7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				35C671A01F964F360051F538 /* UIStoryboard+Name.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -367,11 +388,18 @@
 			files = (
 				355B177A1F91070D00EC63A7 /* StoryboardIdentifiable.swift in Sources */,
 				355B17741F9100F300EC63A7 /* Codable+Extension.swift in Sources */,
+				35C6719F1F9649850051F538 /* InteractionDelegate.swift in Sources */,
 				355B17531F90F3FC00EC63A7 /* ViewController.swift in Sources */,
 				355B17721F90FD0B00EC63A7 /* APIComponents.swift in Sources */,
 				355B17511F90F3FC00EC63A7 /* AppDelegate.swift in Sources */,
+				35C6719B1F9648BB0051F538 /* Navigator.swift in Sources */,
+				35C671A11F964F360051F538 /* UIStoryboard+Name.swift in Sources */,
+				35C6719D1F9649360051F538 /* Interactor.swift in Sources */,
 				355B17761F91030800EC63A7 /* Register.swift in Sources */,
+				35C671971F96400C0051F538 /* SignUpViewController.swift in Sources */,
 				355B17781F9105C100EC63A7 /* Const.swift in Sources */,
+				35C671A31F964FC50051F538 /* UIViewController+StoryboardIdentifiable.swift in Sources */,
+				35C671991F96401F0051F538 /* SignInViewController.swift in Sources */,
 				35C671951F963B2B0051F538 /* InitialViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
