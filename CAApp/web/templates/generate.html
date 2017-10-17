@@ -1,23 +1,25 @@
 {{define "title"}}Generate Certificate{{end}}
 
 {{define "body"}}
-<h1>Generate Certificate</h1>
+<h2>Generate Certificate</h2>
 
 {{ if .Response.IsResponse }}
     {{ if .Response.Success }}
-    <div class="alert alert-success" role="alert">
-        Successful
-    </div>
+        {{ if gt (len .Response.Message) 0 }}
+            <div class="alert alert-success" role="alert">
+                {{ .Response.Message }}
+            </div>
+        {{ end }}
     {{ else }}
     <div class="alert alert-danger" role="alert">
-        Unable to submit the request, retry later.
+        {{ .Response.ErrorMessage }}
     </div>
     {{ end }}
 {{ end }}
 
 <label>Email: {{.Email}}</label>
 
-<form action="generate.html" method="post">
+<form method="post">
     <div class="form-group">
         <label for="caCertificatePath">CA Certificate</label>
         <input type="text" class="form-control" id="caCertificatePath" name="caCertificatePath"~
@@ -29,7 +31,16 @@
                value="/home/vitaliy/projects/gocode/src/CAApp/channel/crypto-config/peerOrganizations/org1.example.com/ca/0e729224e8b3f31784c8a93c5b8ef6f4c1c91d9e6e577c45c33163609fe40011_sk">
     </div>
     <input type="hidden" name="submitted" value="true">
-    <button type="submit" class="btn btn-default">Generate</button>
+    <div class="form-group">
+        <button type="submit" formaction="generate" class="btn btn-default">Generate</button>
+    </div>
+
+    <div class="form-group">
+        <label for="kvsPath">Fabric Key/Value Storage Path</label>
+        <input type="text" class="form-control" id="kvsPath" name="kvsPath" value="/tmp/fabric-client-kvs_peerOrg1">
+    </div>
+
+    <button type="submit" formaction="deploy" value="555" class="btn btn-default">Generate and Deploy</button>
 </form>
 
 <hr>
@@ -37,42 +48,42 @@
 
 
 {{ if .CertificateInfo }}
-    {{ if .CertificateInfo.SKI }}
-        <div class="form-group">
-            <label for="privateKey">SKI</label>
-            <input type="text" class="form-control" id="ski" name="ski" value="{{.CertificateInfo.SKI}}">
-        </div>
-    {{ end }}
+        {{ if .CertificateInfo.SKI }}
+            <div class="form-group">
+                <label for="privateKey">SKI</label>
+                <input type="text" class="form-control" id="ski" name="ski" value="{{.CertificateInfo.SKI}}">
+            </div>
+        {{ end }}
 
 
-    {{ if .CertificateInfo.PrivateKey }}
-        <div class="form-group">
-            <label for="privateKey">Private key</label>
-            <textarea rows="5" type="text" class="form-control" id="privateKey" name="privateKey">{{.CertificateInfo.PrivateKey}}</textarea>
-        </div>
-    {{ end }}
+        {{ if .CertificateInfo.PrivateKey }}
+            <div class="form-group">
+                <label for="privateKey">Private key</label>
+                <textarea rows="5" type="text" class="form-control" id="privateKey" name="privateKey">{{.CertificateInfo.PrivateKey}}</textarea>
+            </div>
+        {{ end }}
 
-    {{ if .CertificateInfo.PublicKey }}
-        <div class="form-group">
-            <label for="publicKey">Public Key</label>
-            <textarea rows="4" type="text" class="form-control" id="publicKey" name="publicKey">{{.CertificateInfo.PublicKey}}</textarea>
-        </div>
-    {{ end }}
+        {{ if .CertificateInfo.PublicKey }}
+            <div class="form-group">
+                <label for="publicKey">Public Key</label>
+                <textarea rows="4" type="text" class="form-control" id="publicKey" name="publicKey">{{.CertificateInfo.PublicKey}}</textarea>
+            </div>
+        {{ end }}
 
-    {{ if .CertificateInfo.CertificateString }}
-        <div class="form-group">
-            <label for="certificateString">Certificate String</label>
-            <textarea rows="4" type="text" class="form-control" id="certificateString" name="certificateString">{{.CertificateInfo.CertificateString}}</textarea>
-        </div>
-    {{ end }}
+        {{ if .CertificateInfo.CertificateString }}
+            <div class="form-group">
+                <label for="certificateString">Certificate String</label>
+                <textarea rows="4" type="text" class="form-control" id="certificateString" name="certificateString">{{.CertificateInfo.CertificateString}}</textarea>
+            </div>
+        {{ end }}
 
 
-    {{ if .CertificateInfo.Certificate }}
-        <div class="form-group">
-            <label for="certificateString">Certificate</label>
-            <textarea rows="4" type="text" class="form-control" id="certificate" name="certificateString">{{.CertificateInfo.Certificate}}</textarea>
-        </div>
-    {{ end }}
+        {{ if .CertificateInfo.Certificate }}
+            <div class="form-group">
+                <label for="certificateString">Certificate</label>
+                <textarea rows="4" type="text" class="form-control" id="certificate" name="certificateString">{{.CertificateInfo.Certificate}}</textarea>
+            </div>
+        {{ end }}
 
 
 {{ end }}

@@ -9,9 +9,10 @@ type LoginModel struct {
 }
 
 type ResponseInfo struct {
-	Success  bool
-	IsResponse bool
-	Error error
+	Success      bool
+	IsResponse   bool
+	ErrorMessage string
+	Message string
 }
 
 type GenerateModel struct {

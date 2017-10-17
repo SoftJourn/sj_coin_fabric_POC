@@ -31,9 +31,9 @@ func (app *Application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Error: %v\n", err)
 			data.Response.Success = false
 			data.Response.IsResponse = true
-			data.Response.Error = err
+			data.Response.ErrorMessage = err.Error()
 			renderTemplate(w, r, "login.html", data)
-			data.Response.Error = nil
+			data.Response.ErrorMessage = ""
 			return
 		}
 
@@ -48,7 +48,8 @@ func (app *Application) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["email"] = user.Email
 		session.Save(r, w)
 
-		http.Redirect(w, r, "/generate.html",  http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/generate",  http.StatusSeeOther)
+		return
 	}
 	renderTemplate(w, r, "login.html", data)
 }

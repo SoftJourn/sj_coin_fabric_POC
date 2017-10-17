@@ -5,14 +5,12 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/asn1"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"math/big"
 	"strings"
 	"time"
-	"crypto/sha1"
 	"fabric/bccsp/utils"
 	"crypto/sha256"
 )
@@ -90,7 +88,7 @@ func Generate(email string, caCertificatePath string, caKeyPath string) (Certifi
 	}
 	fmt.Printf("\nPublic key to encrypted PEM: \n%s\n", publicEncPEM)
 
-	subjectKeyId, _ := getSubjectKey(privateKey)
+	//subjectKeyId, _ := getSubjectKey(privateKey)
 
 	certTemplate := &x509.Certificate{
 		SerialNumber:    big.NewInt(1658),
@@ -104,7 +102,7 @@ func Generate(email string, caCertificatePath string, caKeyPath string) (Certifi
 		PublicKey:          privateKey.PublicKey,
 		NotBefore:          time.Now(),
 		NotAfter:           time.Now().Add(time.Hour * 48),
-		SubjectKeyId:       subjectKeyId,
+		//SubjectKeyId:       subjectKeyId,
 		KeyUsage:           x509.KeyUsageDigitalSignature,
 	}
 
@@ -156,28 +154,28 @@ func getPrivateSKI(privateKey *ecdsa.PrivateKey) (ski []byte) {
 	return hash.Sum(nil)
 }
 
-func getSubjectKey(key *ecdsa.PrivateKey) ([]byte, error) {
-	publicKey, err := x509.MarshalPKIXPublicKey(&key.PublicKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal public key: %s", err)
-	}
+//func getSubjectKey(key *ecdsa.PrivateKey) ([]byte, error) {
+//	publicKey, err := x509.MarshalPKIXPublicKey(&key.PublicKey)
+//	if err != nil {
+//		return nil, fmt.Errorf("failed to marshal public key: %s", err)
+//	}
+//
+//	var subPKI subjectPublicKeyInfo
+//	_, err = asn1.Unmarshal(publicKey, &subPKI)
+//	if err != nil {
+//		return nil, fmt.Errorf("failed to unmarshal public key: %s", err)
+//	}
+//
+//	return bigIntHash(subPKI.SubjectPublicKey.Bytes), nil
+//}
 
-	var subPKI subjectPublicKeyInfo
-	_, err = asn1.Unmarshal(publicKey, &subPKI)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal public key: %s", err)
-	}
-
-	return bigIntHash(subPKI.SubjectPublicKey.Bytes), nil
-}
-
-type subjectPublicKeyInfo struct {
-	Algorithm        pkix.AlgorithmIdentifier
-	SubjectPublicKey asn1.BitString
-}
-
-func bigIntHash(n []byte) []byte {
-	h := sha1.New()
-	h.Write(n)
-	return h.Sum(nil)
-}
+//type subjectPublicKeyInfo struct {
+//	Algorithm        pkix.AlgorithmIdentifier
+//	SubjectPublicKey asn1.BitString
+//}
+//
+//func bigIntHash(n []byte) []byte {
+//	h := sha1.New()
+//	h.Write(n)
+//	return h.Sum(nil)
+//}
