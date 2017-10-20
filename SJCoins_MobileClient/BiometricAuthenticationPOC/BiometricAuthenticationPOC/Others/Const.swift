@@ -11,4 +11,8 @@ struct Constants {
     struct storyboardID {
         
     }
+    
+    struct api {
+        static let baseURL = "http://192.168.102.74:3000/api"
+    }
 }

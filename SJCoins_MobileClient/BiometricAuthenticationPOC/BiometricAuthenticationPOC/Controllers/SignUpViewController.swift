@@ -53,7 +53,15 @@ class SignUpViewController: BaseSignViewController {
     // MARK: Public methods
     override func authorization() {
         HUD.show(.label("Registering ..."))
-        AuthorizationManager.registerRequest()
+        AuthorizationManager.registerRequest(ldap: ldapString, password: passString, face: face!) { result in
+//            switch result {
+//            case: .success(Value)
+//                return
+//            case .failure(Error)
+//                return
+//            }
+            
+        }
         
 //        AuthorizationManager.authRequest(login: login, password: password) { [unowned self] error in
 //            error != nil ? self.authFailed() : self.authSuccess()

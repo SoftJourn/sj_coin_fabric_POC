@@ -20,15 +20,14 @@ class BaseSignViewController: UIViewController {
     @IBOutlet weak var passwordErrorLabel: UILabel!
     @IBOutlet weak var passwordTextField: UITextField!
 
+    var ldapString: String { return ldapTextField.text! }
+    var passString: String { return passwordTextField.text! }
     var login: validationStatus { return Validator.validate(ldapString) }
     var password: validationStatus { return Validator.validate(passString) }
 
     private var scrollService: KeyboardManager!
-    private var ldapString: String { return ldapTextField.text! }
-    private var passString: String { return passwordTextField.text! }
     private var imageResult: ImageResult?
     private let picker = UIImagePickerController()
-    
     
     // MARK: Controller life cycle
     override func viewDidLoad() {
