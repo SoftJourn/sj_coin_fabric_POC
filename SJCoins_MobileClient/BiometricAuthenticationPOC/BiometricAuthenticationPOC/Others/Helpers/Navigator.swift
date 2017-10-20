@@ -32,16 +32,30 @@ class Navigator {
     
     // MARK: Public methods
     // PUSH
+    func pushSignUpScreen() {
+        let controller: SignUpViewController = UIStoryboard.storyboard(.main).instantiate()
+        push(controller)
+    }
+    
+    func pushSignInScreen() {
+        let controller: SignInViewController = UIStoryboard.storyboard(.main).instantiate()
+        push(controller)
+    }
+    
+    func pushLdapSignInScreen() {
+        let controller: LdapSignInViewController = UIStoryboard.storyboard(.main).instantiate()
+        push(controller)
+    }
 
     
     // PRESENT
-    func presentSignUpScreen() {
-        let controller: SignUpViewController = UIStoryboard.storyboard(.main).instantiate()
-        present(controller)
-    }
-    
-    func presentSignInScreen() {
-        let controller: SignInViewController = UIStoryboard.storyboard(.main).instantiate()
-        present(controller)
-    }
+//    func presentSignUpScreen() {
+//        let controller: SignUpViewController = UIStoryboard.storyboard(.main).instantiate()
+//        present(controller)
+//    }
+//
+//    func presentSignInScreen() {
+//        let controller: SignInViewController = UIStoryboard.storyboard(.main).instantiate()
+//        present(controller)
+//    }
 }

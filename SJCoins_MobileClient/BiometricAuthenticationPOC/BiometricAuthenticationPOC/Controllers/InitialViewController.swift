@@ -14,7 +14,6 @@ class InitialViewController: UIViewController {
     static let identifier = "\(InitialViewController.self)"
     
     // MARK: Properties
-    @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var signUpButton: UIButton!
     @IBOutlet private weak var signInButton: UIButton!
     
@@ -22,6 +21,7 @@ class InitialViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
+        configureNavigationBar()
     }
     
     deinit {
@@ -30,21 +30,21 @@ class InitialViewController: UIViewController {
     
     // MARK: Actions
     @IBAction private func signUpButtonPressed(_ sender: UIButton) {
-        Navigator(navigationController).presentSignUpScreen()
+        Navigator(navigationController).pushSignUpScreen()
     }
     
     @IBAction private func signInButtonPressed(_ sender: UIButton) {
-        Navigator(navigationController).presentSignInScreen()
+        Navigator(navigationController).pushSignInScreen()
     }
     
     private func configureButtons() {
-        
-        let radius = signUpButton.frame.height / 2
-        
-        signUpButton.layer.cornerRadius = radius
-        signInButton.layer.cornerRadius = radius
         signInButton.layer.borderWidth = 1
-        
-        signInButton.layer.borderColor = UIColor(red: 49, green: 170, blue: 255, alpha: 1).cgColor
+        signInButton.layer.borderColor = UIColor(red: CGFloat(49)/255, green: CGFloat(170)/255, blue: CGFloat(255)/255, alpha: 1.0).cgColor
+    }
+    
+    private func configureNavigationBar() {
+        guard let bar = navigationController?.navigationBar else { return }
+        bar.shadowImage = UIImage()
+        bar.setBackgroundImage(UIImage(), for: .default)
     }
 }

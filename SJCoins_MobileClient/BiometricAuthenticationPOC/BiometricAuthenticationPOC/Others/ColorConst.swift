@@ -1,12 +1,11 @@
 //
-//  APIComponents.swift
+//  ColorConst.swift
 //  BiometricAuthenticationPOC
 //
-//  Created by Oleg Pankiv on 10/13/17.
+//  Created by Oleg Pankiv on 10/18/17.
 //  Copyright © 2017 SoftJourn. All rights reserved.
 //
 
 import Foundation
 
-// Result enum, error enum
 

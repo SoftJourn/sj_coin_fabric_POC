@@ -26,6 +26,13 @@ class SignInViewController: UIViewController {
     }
     
     // MARK: Actions
+    @IBAction func withLdapButtonClicked(_ sender: UIButton) {
+        Navigator(navigationController).pushLdapSignInScreen()
+    }
+    
+    @IBAction func withFaceButtonClicked(_ sender: UIButton) {
+    
+    }
     
     // MARK: Private methods
     

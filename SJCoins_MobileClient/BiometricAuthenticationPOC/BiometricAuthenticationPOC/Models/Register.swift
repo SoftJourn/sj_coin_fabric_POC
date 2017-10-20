@@ -7,7 +7,10 @@
 //
 
 struct Register: Codable {
+    let email: String
     let firstName: String
     let lastName: String
-    let email: String
+    let personId: String
+    let faceId: String
+    let persistentFaceId: String
 }
