@@ -30,6 +30,10 @@ class Navigator {
         navController?.present(controller, animated: true, completion: nil)
     }
     
+    private func presentAsRoot(_ controller: UIViewController) {
+        UIApplication.shared.keyWindow?.rootViewController? = controller
+    }
+    
     // MARK: Public methods
     // PUSH
     func pushSignUpScreen() {
@@ -47,15 +51,19 @@ class Navigator {
         push(controller)
     }
 
+    func pushFaceSignInScreen() {
+        let controller: FaceSignInViewController = UIStoryboard.storyboard(.main).instantiate()
+        push(controller)
+    }
     
-    // PRESENT
-//    func presentSignUpScreen() {
-//        let controller: SignUpViewController = UIStoryboard.storyboard(.main).instantiate()
-//        present(controller)
-//    }
-//
-//    func presentSignInScreen() {
-//        let controller: SignInViewController = UIStoryboard.storyboard(.main).instantiate()
-//        present(controller)
-//    }
+    // NAVIGATE AS ROOT
+    func navigateToLoginScreen() {
+        let controller = UIStoryboard.storyboard(.main).instantiateViewController(withIdentifier: "NavigationInitialViewController")
+        presentAsRoot(controller)
+    }
+
+    func navigateToMainScreen() {
+        let controller = UIStoryboard.storyboard(.main).instantiateViewController(withIdentifier: "NavigationMainViewController")
+        presentAsRoot(controller)
+    }
 }

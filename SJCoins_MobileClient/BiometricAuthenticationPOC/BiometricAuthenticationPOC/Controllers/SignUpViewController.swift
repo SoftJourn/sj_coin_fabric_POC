@@ -8,6 +8,7 @@
 
 import UIKit
 import PKHUD
+import SwiftyUserDefaults
 
 class SignUpViewController: BaseSignViewController {
     
@@ -35,7 +36,7 @@ class SignUpViewController: BaseSignViewController {
         takePhoto { [unowned self] image in
             self.face = image
             self.attachFaceButton.setTitle("FACE ATTACHED", for: .normal)
-            HUD.flash(.success, delay: 1.0)
+            //HUD.flash(.success, delay: 1.0)
             debugPrint(image)
         }
     }
@@ -50,23 +51,32 @@ class SignUpViewController: BaseSignViewController {
         attachFaceButton.layer.borderColor = UIColor(red: CGFloat(49)/255, green: CGFloat(170)/255, blue: CGFloat(255)/255, alpha: 1.0).cgColor
     }
     
+    private func handleAuthorization(result: Result<Any>) {
+        switch result {
+        case .success(let model):
+            // Save model in UserDefaults
+            var models = [RegisterResponseBody]()
+            models.append(model as! RegisterResponseBody)
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(models), forKey:"models")
+
+            HUD.flash(.success, delay: Constants.delay.success) { [unowned self] _ in
+                self.navigationController?.popViewController(animated: true)
+            }
+        case .failure(let error):
+            HUD.flash(.labeledError(title: "", subtitle: error.localizedDescription), delay: Constants.delay.failed)
+            debugPrint(error)
+        }
+    }
+    
     // MARK: Public methods
     override func authorization() {
         HUD.show(.label("Registering ..."))
         AuthorizationManager.registerRequest(ldap: ldapString, password: passString, face: face!) { result in
-//            switch result {
-//            case: .success(Value)
-//                return
-//            case .failure(Error)
-//                return
-//            }
-            
+            DispatchQueue.main.async {
+                HUD.hide()
+                self.handleAuthorization(result: result)
+            }
         }
-        
-//        AuthorizationManager.authRequest(login: login, password: password) { [unowned self] error in
-//            error != nil ? self.authFailed() : self.authSuccess()
-//        }
-        
     }
     
     override func showError() {

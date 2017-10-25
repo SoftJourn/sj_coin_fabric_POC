@@ -31,7 +31,7 @@ class KeyboardManager: NSObject {
         tapGeture.isEnabled = true
         
         var userInfo = notification.userInfo!
-        var keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
+        var keyboardFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
         keyboardFrame = view.convert(keyboardFrame, from: nil)
         
         var contentInset = scrollView.contentInset

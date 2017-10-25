@@ -31,7 +31,7 @@ class SignInViewController: UIViewController {
     }
     
     @IBAction func withFaceButtonClicked(_ sender: UIButton) {
-    
+        Navigator(navigationController).pushFaceSignInScreen()
     }
     
     // MARK: Private methods

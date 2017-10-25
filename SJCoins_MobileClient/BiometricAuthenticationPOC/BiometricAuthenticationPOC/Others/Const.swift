@@ -8,8 +8,9 @@
 
 struct Constants {
     
-    struct storyboardID {
-        
+    struct delay {
+        static let success = 0.5
+        static let failed = 2.0
     }
     
     struct api {
