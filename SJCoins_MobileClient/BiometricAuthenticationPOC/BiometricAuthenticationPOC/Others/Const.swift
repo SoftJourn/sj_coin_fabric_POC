@@ -8,6 +8,11 @@
 
 struct Constants {
     
+    struct key {
+        static let models = "models"
+        static let user = "user"
+    }
+    
     struct delay {
         static let success = 0.5
         static let failed = 2.0

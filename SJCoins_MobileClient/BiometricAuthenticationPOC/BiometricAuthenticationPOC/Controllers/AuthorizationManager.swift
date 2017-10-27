@@ -41,7 +41,14 @@ class AuthorizationManager: APIHelper {
         request.httpMethod = Methods.post.rawValue
         request.httpBody = try! bodyStruct.encode()
         asynch(request) { result in
-            complited(result)
+            switch result {
+            case .success(let data):
+                // Create model object
+                let loginModel = try! LoginResponseBody.decode(data: data as! Data)
+                complited(.success(loginModel))
+            case .failure:
+                complited(result)
+            }
         }
     }
 }

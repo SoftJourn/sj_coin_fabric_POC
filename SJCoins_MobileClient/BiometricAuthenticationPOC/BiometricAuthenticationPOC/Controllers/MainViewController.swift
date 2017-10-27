@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftyUserDefaults
 
 class MainViewController: UIViewController {
     
@@ -14,11 +15,15 @@ class MainViewController: UIViewController {
     static let identifier = "\(MainViewController.self)"
     
     // MARK: Properties
-    
+    @IBOutlet private weak var successLabel: UILabel!
     
     // MARK: Controller life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+         successLabel.text = Defaults[.user]
     }
     
     deinit {
@@ -28,6 +33,8 @@ class MainViewController: UIViewController {
     // MARK: Actions
     @IBAction func signOutButtonClicked(_ sender: UIBarButtonItem) {
         Navigator(navigationController).navigateToLoginScreen()
+        UserDefaults.standard.removeObject(forKey: Constants.key.user)
+        Defaults.remove(.user)
     }
     // MARK: Private methods
     

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2AECC5A991D9D13A17692ABE /* Pods_BiometricAuthenticationPOC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 777FF58233BF692F873F37CC /* Pods_BiometricAuthenticationPOC.framework */; };
+		352582E81FA1FA1B003F3DED /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352582E71FA1FA1B003F3DED /* CameraManager.swift */; };
+		352582EA1FA1FEFF003F3DED /* CameraManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352582E91FA1FEFF003F3DED /* CameraManagerDelegate.swift */; };
+		352582EC1FA221D0003F3DED /* LoginResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352582EB1FA221D0003F3DED /* LoginResponseBody.swift */; };
 		35352D151FA0D87F001F1391 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35352D141FA0D87F001F1391 /* MainViewController.swift */; };
 		355B17511F90F3FC00EC63A7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355B17501F90F3FC00EC63A7 /* AppDelegate.swift */; };
 		355B17561F90F3FC00EC63A7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 355B17541F90F3FC00EC63A7 /* Main.storyboard */; };
@@ -41,6 +44,9 @@
 
 /* Begin PBXFileReference section */
 		2EE0C7D4B29A6A9C5527D31B /* Pods-BiometricAuthenticationPOC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiometricAuthenticationPOC.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BiometricAuthenticationPOC/Pods-BiometricAuthenticationPOC.debug.xcconfig"; sourceTree = "<group>"; };
+		352582E71FA1FA1B003F3DED /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		352582E91FA1FEFF003F3DED /* CameraManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManagerDelegate.swift; sourceTree = "<group>"; };
+		352582EB1FA221D0003F3DED /* LoginResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponseBody.swift; sourceTree = "<group>"; };
 		35352D141FA0D87F001F1391 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		355B174D1F90F3FC00EC63A7 /* BiometricAuthenticationPOC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BiometricAuthenticationPOC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		355B17501F90F3FC00EC63A7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -154,6 +160,7 @@
 				355B17751F91030800EC63A7 /* RegisterRequest.swift */,
 				35A3A23E1FA095DC009C406C /* RegisterResponse.swift */,
 				35A3A2401FA0961F009C406C /* LoginRequestBody.swift */,
+				352582EB1FA221D0003F3DED /* LoginResponseBody.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -187,6 +194,7 @@
 			children = (
 				984CE28C1F97CD5700CE5D80 /* AuthorizationManager.swift */,
 				9871883C1F97F16400C3E565 /* KeyboardManager.swift */,
+				352582E71FA1FA1B003F3DED /* CameraManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -196,6 +204,7 @@
 			children = (
 				355B17791F91070D00EC63A7 /* StoryboardIdentifiable.swift */,
 				35C6719E1F9649850051F538 /* InteractionDelegate.swift */,
+				352582E91FA1FEFF003F3DED /* CameraManagerDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -420,15 +429,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				355B177A1F91070D00EC63A7 /* StoryboardIdentifiable.swift in Sources */,
+				352582EA1FA1FEFF003F3DED /* CameraManagerDelegate.swift in Sources */,
 				35352D151FA0D87F001F1391 /* MainViewController.swift in Sources */,
 				35A3A2411FA0961F009C406C /* LoginRequestBody.swift in Sources */,
 				984CE2871F977C5400CE5D80 /* ColorConst.swift in Sources */,
 				355B17741F9100F300EC63A7 /* Codable+Extension.swift in Sources */,
 				35C6719F1F9649850051F538 /* InteractionDelegate.swift in Sources */,
 				35A3A23F1FA095DC009C406C /* RegisterResponse.swift in Sources */,
+				352582E81FA1FA1B003F3DED /* CameraManager.swift in Sources */,
 				35C671A51F99FB6F0051F538 /* APIHelper.swift in Sources */,
 				981530BF1F98C60D0053CB86 /* Validator.swift in Sources */,
 				984CE28B1F978B5100CE5D80 /* LdapSignInViewController.swift in Sources */,
+				352582EC1FA221D0003F3DED /* LoginResponseBody.swift in Sources */,
 				355B17511F90F3FC00EC63A7 /* AppDelegate.swift in Sources */,
 				35C6719B1F9648BB0051F538 /* Navigator.swift in Sources */,
 				35C671A11F964F360051F538 /* UIStoryboard+Name.swift in Sources */,

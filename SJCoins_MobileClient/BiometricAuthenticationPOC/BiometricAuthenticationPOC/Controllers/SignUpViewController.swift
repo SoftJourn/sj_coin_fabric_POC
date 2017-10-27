@@ -20,11 +20,13 @@ class SignUpViewController: BaseSignViewController {
     @IBOutlet private weak var signUpButton: UIButton!
     
     private var face: UIImage?
-    
+    private var cameraService: CameraManager!
+
     // MARK: Controller life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
+        cameraService = CameraManager(delegate: self)
     }
     
     deinit {
@@ -33,7 +35,7 @@ class SignUpViewController: BaseSignViewController {
     
     // MARK: Actions
     @IBAction func attachFaceButtonClicked(_ sender: UIButton) {
-        takePhoto { [unowned self] image in
+        cameraService.takePhoto { [unowned self] image in
             self.face = image
             self.attachFaceButton.setTitle("FACE ATTACHED", for: .normal)
             //HUD.flash(.success, delay: 1.0)
@@ -54,14 +56,28 @@ class SignUpViewController: BaseSignViewController {
     private func handleAuthorization(result: Result<Any>) {
         switch result {
         case .success(let model):
-            // Save model in UserDefaults
-            var models = [RegisterResponseBody]()
-            models.append(model as! RegisterResponseBody)
-            UserDefaults.standard.set(try? PropertyListEncoder().encode(models), forKey:"models")
-
-            HUD.flash(.success, delay: Constants.delay.success) { [unowned self] _ in
-                self.navigationController?.popViewController(animated: true)
+            let model = model as! RegisterResponseBody
+            var existingModels = [RegisterResponseBody]()
+            
+            // Take existing models from UserDefaults
+            if let data = UserDefaults.standard.value(forKey: Constants.key.models) as? Data, let users = try? PropertyListDecoder().decode(Array<RegisterResponseBody>.self, from: data) {
+                existingModels = users
             }
+            if existingModels.count > 0 {
+                for user in existingModels {
+                    if user.email != model.email {
+                        existingModels.append(model)
+                    }
+                }
+            } else {
+                existingModels.append(model)
+            }
+            debugPrint(existingModels)
+            // Save models in UserDefaults
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(existingModels), forKey: Constants.key.models)
+
+            HUD.flash(.success, delay: 0.5)
+            navigationController?.popViewController(animated: true)
         case .failure(let error):
             HUD.flash(.labeledError(title: "", subtitle: error.localizedDescription), delay: Constants.delay.failed)
             debugPrint(error)
@@ -83,5 +99,12 @@ class SignUpViewController: BaseSignViewController {
         super.showError()
         guard login == .success && password == .success && face == nil else { return }
         HUD.flash(.label("Face not attached."), delay: 1.0)
+    }
+}
+
+extension SignUpViewController: CameraManagerDelegate {
+    
+    func cameraManager(present picker: UIImagePickerController) {
+        present(picker, animated: true, completion: nil)
     }
 }

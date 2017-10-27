@@ -10,13 +10,13 @@ import Foundation
 import SwiftyUserDefaults
 
 extension DefaultsKeys {
-    static let registredUser = DefaultsKey<RegisterResponseBody?>("registredUser")
-    static let libraries = DefaultsKey<[RegisterResponseBody]>("libraries")
+    static let user = DefaultsKey<String>("loggedUser")
 }
 
-extension UserDefaults {
-    subscript(key: DefaultsKey<RegisterResponseBody>) -> RegisterResponseBody {
-        get { return unarchive(key)! }
-        set { archive(key, newValue) }
-    }
-}
+//extension UserDefaults {
+//    subscript(key: DefaultsKey<RegisterResponseBody>) -> RegisterResponseBody {
+//        get { return unarchive(key)! }
+//        set { archive(key, newValue) }
+//    }
+//}
+

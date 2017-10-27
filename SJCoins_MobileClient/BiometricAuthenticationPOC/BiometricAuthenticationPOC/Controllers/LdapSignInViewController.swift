@@ -8,6 +8,7 @@
 
 import UIKit
 import PKHUD
+import SwiftyUserDefaults
 
 class LdapSignInViewController: BaseSignViewController {
     
@@ -36,13 +37,30 @@ class LdapSignInViewController: BaseSignViewController {
         switch result {
         case .success(let model):
             // Save model in UserDefaults
+            let user = model as! LoginResponseBody
+            let string = "\(user.firstName) \(user.lastName) signed in successfully."
+            Defaults[.user] = string
             
-            
-            
-            HUD.flash(.success, delay: Constants.delay.success) { [unowned self] _ in
-                // Navigate as root to another view controller
-                Navigator(self.navigationController).navigateToMainScreen()
+            let model = RegisterResponseBody(email: user.email, firstName: user.firstName, lastName: user.lastName, personId: user.personId)
+            var existingModels = [RegisterResponseBody]()
+            // Take existing models from UserDefaults
+            if let data = UserDefaults.standard.value(forKey: Constants.key.models) as? Data, let users = try? PropertyListDecoder().decode(Array<RegisterResponseBody>.self, from: data) {
+                existingModels = users
             }
+            if existingModels.count > 0 {
+                for user in existingModels {
+                    if user.email != model.email {
+                        existingModels.append(model)
+                    }
+                }
+            } else {
+                existingModels.append(model)
+            }
+            debugPrint(existingModels)
+            // Save models in UserDefaults
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(existingModels), forKey: Constants.key.models)
+
+            Navigator(navigationController).navigateToMainScreen()
         case .failure(let error):
             HUD.flash(.labeledError(title: "", subtitle: error.localizedDescription), delay: Constants.delay.failed)
             debugPrint(error)
@@ -51,10 +69,7 @@ class LdapSignInViewController: BaseSignViewController {
     
     // MARK: Public methods
     override func authorization() {
-        HUD.show(.label("Login ..."))
-        
-        // Take registred email
-        
+        HUD.show(.label("Signing in ..."))
         AuthorizationManager.loginRequest(ldap: ldapString, password: passString, email: "", face: nil) { result in
             DispatchQueue.main.async {
                 HUD.hide()

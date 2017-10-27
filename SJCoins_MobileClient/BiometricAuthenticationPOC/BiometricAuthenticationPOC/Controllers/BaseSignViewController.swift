@@ -11,7 +11,6 @@ import UIKit
 class BaseSignViewController: UIViewController {
     
     // MARK: Constants
-    typealias ImageResult = (UIImage) -> ()
     
     // MARK: Properties
     @IBOutlet weak var scrollView: UIScrollView!
@@ -19,15 +18,13 @@ class BaseSignViewController: UIViewController {
     @IBOutlet weak var ldapTextField: UITextField!
     @IBOutlet weak var passwordErrorLabel: UILabel!
     @IBOutlet weak var passwordTextField: UITextField!
-
+    
     var ldapString: String { return ldapTextField.text! }
     var passString: String { return passwordTextField.text! }
     var login: validationStatus { return Validator.validate(ldapString) }
     var password: validationStatus { return Validator.validate(passString) }
 
     private var scrollService: KeyboardManager!
-    private var imageResult: ImageResult?
-    private let picker = UIImagePickerController()
     
     // MARK: Controller life cycle
     override func viewDidLoad() {
@@ -37,7 +34,6 @@ class BaseSignViewController: UIViewController {
         passwordTextField.returnKeyType = .done
         scrollService = KeyboardManager(scrollView, view)
         scrollService.configureSelf()
-        picker.delegate = self
     }
     
     deinit {
@@ -67,18 +63,6 @@ class BaseSignViewController: UIViewController {
         }        
     }
     
-    func takePhoto(result: @escaping ImageResult) {
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            imageResult = result
-            picker.allowsEditing = false
-            picker.sourceType = .camera
-            picker.cameraDevice = .front
-            picker.cameraCaptureMode = .photo
-            picker.modalPresentationStyle = .fullScreen
-            present(picker, animated: true, completion: nil)
-        }
-    }
-    
     // MARK: Public methods
     func authorization() {
     
@@ -87,6 +71,10 @@ class BaseSignViewController: UIViewController {
     func showError() {
         handleValidation(status: login, viaLabel: ldapErrorLabel)
         handleValidation(status: password, viaLabel: passwordErrorLabel)
+    }
+    
+    func emailTextFieldDidBeginEditing() {
+        
     }
 }
 
@@ -106,18 +94,3 @@ extension BaseSignViewController: UITextFieldDelegate {
         return true
     }
 }
-
-extension BaseSignViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        var capturedImage = UIImage()
-        capturedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
-        imageResult?(capturedImage)
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-}
-
