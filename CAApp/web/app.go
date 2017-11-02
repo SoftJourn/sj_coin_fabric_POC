@@ -16,6 +16,8 @@ func Serve(app *controllers.Application) {
 	http.HandleFunc("/logout", app.LogoutHandler)
 	http.HandleFunc("/generate", app.GenerateHandler)
 	http.HandleFunc("/deploy", app.GenerateHandler)
+	http.HandleFunc("/api/register", app.RegisterHandler)
+	http.HandleFunc("/api/login", app.FaceLoginHandler)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
@@ -23,7 +25,6 @@ func Serve(app *controllers.Application) {
 
 	var storage = storage.GetInstance()
 	storage.Store = sessions.NewCookieStore([]byte("something-very-secret"))
-
 
 	fmt.Println("Listening (http://192.168.99.100:3000/) ...")
 	http.ListenAndServe(":3000", nil)

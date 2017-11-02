@@ -11,14 +11,14 @@ var port int
 var useSSL bool
 var skipTLS bool
 
-type User struct {
+type LDAPUser struct {
 	Username string
 	Email string
 	FirstName string
 	LastName string
 }
 
-func GetUser(username string, password string) (User, []string, error) {
+func GetUser(username string, password string) (LDAPUser, []string, error) {
 
 	flag.Parse()
 
@@ -37,7 +37,7 @@ func GetUser(username string, password string) (User, []string, error) {
 	}
 	defer client.Close()
 
-	var user User
+	var user LDAPUser
 
 	ok, userData, err := client.Authenticate(username, password)
 	if err != nil {
@@ -48,7 +48,7 @@ func GetUser(username string, password string) (User, []string, error) {
 	}
 	log.Printf("User: %+v", userData)
 
-	user = User{
+	user = LDAPUser{
 		Username:  userData["uid"],
 		Email:     userData["mail"],
 		FirstName: userData["givenName"],

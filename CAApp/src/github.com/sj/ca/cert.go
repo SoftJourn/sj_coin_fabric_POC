@@ -11,9 +11,11 @@ import (
 	"math/big"
 	"strings"
 	"time"
-	"fabric/bccsp/utils"
+	"github.com/hyperledger/fabric/bccsp/utils"
 	"crypto/sha256"
 )
+
+const KvsIdentityTemplate string = "{\"name\":\"{{USERNAME}}\",\"mspid\":\"Org1MSP\",\"roles\":null,\"affiliation\":\"\",\"enrollmentSecret\":\"hfYBbCUYMXzO\",\"enrollment\":{\"signingIdentity\":\"{{SKI}}\",\"identity\":{\"certificate\":\"{{CERTIFICATE}}\"}}}"
 
 type CertificateInfo struct {
 	PublicKey string
@@ -143,6 +145,30 @@ func Generate(email string, caCertificatePath string, caKeyPath string) (Certifi
 	return certificateInfo, err
 }
 
+func Deploy(userId string, certificateInfo CertificateInfo, kvsPath string) error {
+
+	identityString := strings.Replace(KvsIdentityTemplate, "{{USERNAME}}", userId, -1)
+	identityString = strings.Replace(identityString, "{{SKI}}", certificateInfo.SKI, -1)
+	identityString = strings.Replace(identityString, "{{CERTIFICATE}}", certificateInfo.CertificateString, -1)
+
+	err := ioutil.WriteFile(kvsPath + "/" + userId, []byte(identityString), 0664)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
+		return err
+	}
+
+	err = ioutil.WriteFile(kvsPath + "/" + certificateInfo.SKI + "-pub", []byte(certificateInfo.PublicKey), 0664)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
+		return err
+	}
+	err = ioutil.WriteFile(kvsPath + "/" + certificateInfo.SKI + "-priv", []byte(certificateInfo.PrivateKey), 0664)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
+		return err
+	}
+	return nil
+}
 
 // SKI returns the subject key identifier of this key.
 func getPrivateSKI(privateKey *ecdsa.PrivateKey) (ski []byte) {

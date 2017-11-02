@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"net/http"
 	"html/template"
+	"CAApp/src/github.com/sj/services/faceService"
+	"CAApp/src/github.com/sj/services/userService"
 )
 
 type Application struct {
+	FaceService faceService.FaceService
+	UserService userService.UserService
 }
 
 func renderTemplate(w http.ResponseWriter, r *http.Request, templateName string, data interface{}) {
