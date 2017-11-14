@@ -6,7 +6,7 @@
    "GOPATH":"../fixtures",
    "keyValueStore":"/tmp/fabric-client-kvs",
    "eventWaitTime":"30000",
-   "orderer":"grpcs://172.18.0.4:7050",
+   "orderer":"grpcs://orderer.example.com:7050",
    "users":[
       {
          "username":"admin",

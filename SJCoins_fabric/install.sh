@@ -1,3 +1,3 @@
-docker build -t="node_app" .
+docker build -t="node" .
 
-docker run -i -t -p 4000:4000 node_app
+docker run --name=node.example.com --hostname=node.example.com --network=fixtures_default --mount type=bind,source=/tmp/fabric-client-kvs_peerOrg1,target=/tmp/fabric-client-kvs_peerOrg1 -i -t -p 4000:4000 node
