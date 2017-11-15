@@ -18,7 +18,7 @@ services:
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/server_wild_org1or2.example.com-key.pem
     #comment out logging.driver in order to render the debug logs
     logging:
-      driver: none  
+      driver: none
     ports:
       - "7054:7054"
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
@@ -157,3 +157,34 @@ services:
   builder:
     image: ${FABRIC_BUILDER_FIXTURE_IMAGE}:${ARCH}-${FABRIC_BUILDER_FIXTURE_TAG}
     command: tail -F anything
+
+  caapp.example.com:
+    container_name: caapp.example.com
+    hostname: caapp.example.com
+
+    build: ./caapp
+    image: caapp
+    ports:
+      - 3000:3000
+    volumes:
+        - /tmp/fabric-client-kvs_peerOrg1:/tmp/fabric-client-kvs_peerOrg1
+
+  node.example.com:
+    container_name: node.example.com
+    hostname: node.example.com
+
+    build: ./..
+    image: node
+    ports:
+      - 4000:4000
+    volumes:
+        - /tmp/fabric-client-kvs_peerOrg1:/tmp/fabric-client-kvs_peerOrg1
+
+  fabricapp.example.com:
+    container_name: fabricapp.example.com
+    hostname: fabricapp.example.com
+
+    build: ./fabricapp
+    image: fabricapp
+    ports:
+      - 4200:4200

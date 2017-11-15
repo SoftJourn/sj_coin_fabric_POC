@@ -22,7 +22,7 @@ export class ChaincodeService {
     opts.headers = headers;
 
     let dataObject = Object(formData);
-    dataObject.peers = ["localhost:7051","localhost:7056"]
+    dataObject.peers = this.data.channel.peers.split(", ")
 
     let url = environment.apiUrl + 'chaincodes';
 

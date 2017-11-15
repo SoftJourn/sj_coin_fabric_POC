@@ -23,7 +23,7 @@ export class TransferService {
     let dataObject = Object(formData);
     let argsObject = {
       fcn: "transfer",
-      peers:  ["localhost:7051","localhost:7056"],
+      peers:  this.data.channel.peers.split(", "),
       args: ["user_", dataObject.transferTo, dataObject.amount.toString()]
     };
 

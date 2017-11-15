@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://192.168.99.100:4000/'
+  apiUrl: 'http://node.example.com:4000/'
 }

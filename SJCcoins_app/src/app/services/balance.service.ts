@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {DataService} from "./data.service";
 import {
   Http,
@@ -6,14 +6,15 @@ import {
   RequestOptions,
   Headers
 } from '@angular/http';
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class BalanceService {
 
-  constructor(private http: Http, private data:DataService) { }
+  constructor(private http: Http, private data: DataService) {
+  }
 
-  getBalance(formData:string) {
+  getBalance(formData: string) {
     let headers: Headers = new Headers();
     headers.append('Content-Type', 'application/json');
     headers.append('Authorization', this.data.user.token);
@@ -24,7 +25,7 @@ export class BalanceService {
     let dataObject = Object(formData);
     let argsObject = {
       fcn: "balanceOf",
-      peers:  ["localhost:7051","localhost:7056"],
+      peers: this.data.channel.peers.split(", "),
       args: [dataObject.balanceOf]
     };
 

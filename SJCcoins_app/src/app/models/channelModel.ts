@@ -5,5 +5,5 @@ export class ChannelModel {
   readyToCreate:boolean;
   readyToConnect:boolean;
   isConnected:boolean;
-  peers:string = "localhost:7051, localhost:7056";
+  peers:string = "peer0.org1.example.com:7051"; //v1.0.3
 }

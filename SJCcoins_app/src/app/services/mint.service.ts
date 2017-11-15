@@ -25,7 +25,7 @@ export class MintService {
     let dataObject = Object(formData);
     let argsObject = {
       fcn: "mint",
-      peers: ["localhost:7051","localhost:7056"],
+      peers:  this.data.channel.peers.split(", "),
       args: [dataObject.amount.toString()]
     }
 
