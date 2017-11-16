@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://node.example.com:4000/'
+  apiUrl: 'http://sjfabric.softjourn.if.ua:4000/'
 }
