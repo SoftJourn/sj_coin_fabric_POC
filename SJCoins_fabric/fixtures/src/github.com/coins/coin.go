@@ -6,19 +6,17 @@ import (
 	"fmt"
 	"reflect"
 	"encoding/json"
-	"github.com/hyperledger/fabric/bccsp/factory"
-	"github.com/hyperledger/fabric/bccsp"
 	"strconv"
 	"github.com/hyperledger/fabric/common/util"
+	"strings"
+	"encoding/pem"
+	"crypto/x509"
 )
-
 
 var logger *shim.ChaincodeLogger
 
 type CoinChain struct {
 }
-
-var minterHash string
 
 var currencyName string
 
@@ -31,13 +29,13 @@ var channelName string = "mychannel"
 var foundationAccountType string = "foundation_"
 var userAccountType string = "user_"
 
-type CurrentUser struct{
-	HashValue []byte
-	StringValue string
-	BytesValue []byte
-}
-
 func (t *CoinChain) Init(stub shim.ChaincodeStubInterface) pb.Response  {
+
+	/* args
+		0 - minter ID
+		1 - Currency name
+	*/
+
 	_, args := stub.GetFunctionAndParameters()
 
 	if len(args) != 2 {
@@ -49,28 +47,26 @@ func (t *CoinChain) Init(stub shim.ChaincodeStubInterface) pb.Response  {
 	logger = shim.NewLogger(currencyName)
 	logger.Infof("_____ %v Init _____", currencyName)
 
-	err := stub.PutState(currencyKey, []byte(currencyName))
+	currentUserId, err := getCurrentUserId(stub)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	minterHash = args[0]
-	logger.Info("minterHash ", args[0])
-
-	minterBytes, err := json.Marshal(args[0])
+	err = stub.PutState(currencyKey, []byte(currencyName))
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+
+	logger.Info("minter ID: ", args[0])
+
+	minterBytes := []byte(args[0])
 
 	err = stub.PutState(minterKey, minterBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	currentUser := t.getCurrentUser(stub)
-	logger.Info("Current User ", currentUser.StringValue)
-
-	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUser.StringValue})
+	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUserId})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -80,7 +76,7 @@ func (t *CoinChain) Init(stub shim.ChaincodeStubInterface) pb.Response  {
 
 	if len(balancesMap) == 0 {
 		balancesMap = map[string]uint{currentUserAccount:0}
-		t.saveMap(stub, balancesKey, balancesMap);
+		t.saveMap(stub, balancesKey, balancesMap)
 	}
 
 	return shim.Success([]byte(currencyName))
@@ -91,8 +87,11 @@ func (t *CoinChain) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
 	fmt.Println("invoke is running " + function)
 
-	currentUser := t.getCurrentUser(stub)
-	logger.Info("sender (current user)", currentUser.StringValue)
+	currentUserId, err := getCurrentUserId(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	logger.Info("sender (current user)", currentUserId)
 
 	if function == "getColor" {
 		return t.getCurrency(stub, args)
@@ -115,6 +114,12 @@ func (t *CoinChain) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 func (t *CoinChain) transfer(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
+	/* args
+		0 - accountType (user_ , foundation_)
+		1 - receiver ID
+		2 - amount
+	*/
+
 	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
@@ -134,10 +139,12 @@ func (t *CoinChain) transfer(stub shim.ChaincodeStubInterface, args []string) pb
 		return shim.Error("Incorrect amount")
 	}
 
-	currentUser := t.getCurrentUser(stub)
-	logger.Info("Current user: ",currentUser.StringValue)
+	currentUserId, err := getCurrentUserId(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
-	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUser.StringValue})
+	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUserId})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -164,6 +171,13 @@ func (t *CoinChain) transfer(stub shim.ChaincodeStubInterface, args []string) pb
 }
 
 func (t *CoinChain) setCurrency(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+	//Obsolete (setColor) not sure we need this. Chaincode name is currency name
+
+	/* args
+		0 - currency name
+	*/
+
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
@@ -173,9 +187,12 @@ func (t *CoinChain) setCurrency(stub shim.ChaincodeStubInterface, args []string)
 		return shim.Error(err.Error())
 	}
 
-	creator, err := t.getCreatorHash(stub);
+	currentUserId, err := getCurrentUserId(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
-	if reflect.DeepEqual(creator, minterValue) {
+	if reflect.DeepEqual([]byte(currentUserId), minterValue) {
 		return shim.Error("User has no permissions")
 	}
 
@@ -230,32 +247,38 @@ func (t *CoinChain) saveMap(stub shim.ChaincodeStubInterface, mapName string, ma
 }
 
 func (t *CoinChain) mint(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+	/* args
+		0 - amount
+	*/
+
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
-	minterValue, err := stub.GetState(minterKey)
+	minterBytes, err := stub.GetState(minterKey)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	var minterString string
-	json.Unmarshal(minterValue, &minterString)
+	minterString := string(minterBytes)
+	logger.Info("minter ", minterString)
 
-	currentUser := t.getCurrentUser(stub)
-	logger.Info("currentUser.StringValue", currentUser.StringValue)
-	logger.Info("minterString", minterString)
+	currentUserId, err := getCurrentUserId(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
-	if currentUser.StringValue != minterString {
+	if currentUserId != minterString {
 		return shim.Error("No permissions")
 	}
 
 	amount := t.parseAmountUint(args[0])
-	if (amount == 0) {
+	if amount == 0 {
 		return shim.Error("Incorrect amount")
 	}
 
-	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUser.StringValue})
+	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUserId})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -272,21 +295,29 @@ func (t *CoinChain) mint(stub shim.ChaincodeStubInterface, args []string) pb.Res
 
 func (t *CoinChain) distribute(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
+	/* args
+		0.. n-1 - accounts
+		n - amount
+	*/
+
 	if len(args) < 3 {
 		return shim.Error("Incorrect number of arguments. Expecting at least 3")
 	}
 
 	amount := t.parseAmountUint(args[len(args)-1])
-	if (amount == 0) {
+	if amount == 0 {
 		return shim.Error("Incorrect amount")
 	}
 	accounts := args[:len(args)-1]
 	logger.Info("accounts: ", accounts)
 	logger.Info("amount ", amount)
 
-	currentUser := t.getCurrentUser(stub)
+	currentUserId, err := getCurrentUserId(stub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
-	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUser.StringValue})
+	currentUserAccount, err := stub.CreateCompositeKey(userAccountType, []string{currentUserId})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -323,39 +354,12 @@ func (t *CoinChain) distribute(stub shim.ChaincodeStubInterface, args []string) 
 	return shim.Success(nil)
 }
 
-//##### GET ######//
-
-func (t *CoinChain) getCreatorHash(stub shim.ChaincodeStubInterface) ([]byte, error) {
-	creatorHash, err := t.hashCreator(stub)
-	if err != nil {
-		logger.Error(err)
-		return []byte{},  err
-	}
-	return  creatorHash, err
-}
-
-func (t *CoinChain) hashCreator(stub shim.ChaincodeStubInterface) ([]byte, error) {
-	creatorBytes, err := stub.GetCreator()
-	if err != nil {
-		return nil, fmt.Errorf("Failed to get creator")
-	}
-	if creatorBytes == nil {
-		return nil, fmt.Errorf("Creator is not found")
-	}
-	creatorHash, err := factory.GetDefault().Hash(creatorBytes, &bccsp.SHA256Opts{})
-	if err != nil {
-		return nil, fmt.Errorf(fmt.Sprintf("Failed computing SHA256 on [% x]", creatorBytes))
-	}
-	return creatorHash, nil
-}
-
-func (t *CoinChain) getCurrentUser(stub shim.ChaincodeStubInterface) *CurrentUser {
-	creatorHash, _ := t.getCreatorHash(stub)
-	creatorStr := fmt.Sprintf("%x", creatorHash)
-	return &CurrentUser{creatorHash, creatorStr, []byte(creatorStr)}
-}
-
 func (t *CoinChain) balanceOf(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+	/* args
+		0 - user ID
+	*/
+
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
@@ -372,6 +376,13 @@ func (t *CoinChain) balanceOf(stub shim.ChaincodeStubInterface, args []string) p
 
 func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
+	/* args
+		0 - foundation name
+		1 - receiver ID
+		2 - amount
+		3 - notes
+	*/
+
 	if len(args) != 4 {
 		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
@@ -384,7 +395,7 @@ func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, arg
 	logger.Info("withdrawFromFoundation amount", args[2])
 	logger.Info("withdrawFromFoundation note", args[3])
 
-	queryArgs := util.ToChaincodeArgs("isWithdrawAllowed", args[2], args[3])
+	queryArgs := util.ToChaincodeArgs("isWithdrawAllowed", foundationName, args[2], args[3])
 	logger.Info("queryArgs: ", queryArgs)
 	response := stub.InvokeChaincode(foundationName, queryArgs, channelName)
 
@@ -397,7 +408,7 @@ func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, arg
 		}
 		logger.Info("isWithdrawAllowed result ", result)
 
-		if (!result) {
+		if !result {
 			return shim.Error("Failed. Withdrawal is not allowed")
 		}
 
@@ -426,11 +437,33 @@ func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, arg
 			return shim.Success([]byte(strconv.FormatBool(true)))
 			//return shim.Success([]byte(strconv.FormatUint(uint64(balancesMap[foundationAccount]), 10)))
 		}
-
-
 	} else {
 		return shim.Error(response.Message)
 	}
+}
+
+func getCurrentUserId(stub shim.ChaincodeStubInterface) (string, error) {
+
+	var userId string
+
+	creatorBytes, err := stub.GetCreator()
+	if err != nil {
+		return userId, err
+	}
+
+	creatorString :=fmt.Sprintf("%s",creatorBytes)
+	index := strings.Index(creatorString, "-----BEGIN CERTIFICATE-----")
+	certificate := creatorString[index:]
+	block, _ := pem.Decode([]byte(certificate))
+
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return userId, err
+	}
+
+	userId = cert.Subject.CommonName
+	logger.Infof("---- UserID: %v ", userId)
+	return userId, err
 }
 
 func (t *CoinChain) parseAmountUint(amount string) uint {
@@ -444,6 +477,6 @@ func (t *CoinChain) parseAmountUint(amount string) uint {
 func main() {
 	err := shim.Start(new(CoinChain))
 	if err != nil {
-		logger.Errorf("Error starting Cinchain: %s", err)
+		logger.Errorf("Error starting Coin Chain: %s", err)
 	}
 }
