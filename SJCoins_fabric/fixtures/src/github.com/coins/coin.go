@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"encoding/json"
 	"strconv"
-	"github.com/hyperledger/fabric/common/util"
 	"strings"
 	"encoding/pem"
 	"crypto/x509"
+	"github.com/hyperledger/fabric/protos/utils"
 )
 
 var logger *shim.ChaincodeLogger
@@ -24,10 +24,14 @@ var minterKey string = "minter"
 var balancesKey string = "balances"
 var currencyKey string = "currency"
 
-var channelName string = "mychannel"
+//var channelName string = "mychannel"
 
-var foundationAccountType string = "foundation_"
+//var foundationAccountType string = "foundation_"
 var userAccountType string = "user_"
+
+//For TransferFrom
+var txBalancesMap map[string]uint
+var lastTxId string
 
 func (t *CoinChain) Init(stub shim.ChaincodeStubInterface) pb.Response  {
 
@@ -93,6 +97,10 @@ func (t *CoinChain) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	}
 	logger.Info("sender (current user)", currentUserId)
 
+	if lastTxId != stub.GetTxID() {
+		txBalancesMap = make(map[string]uint)
+	}
+
 	if function == "getColor" {
 		return t.getCurrency(stub, args)
 	} else if function == "setColor" {
@@ -101,12 +109,12 @@ func (t *CoinChain) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.mint(stub, args)
 	} else if function == "transfer" {
 		return t.transfer(stub, args)
+	} else if function == "transferFrom" {
+		return t.transferFrom(stub, args)
 	} else if function == "balanceOf" {
 		return t.balanceOf(stub, args)
 	} else if function == "distribute" {
 		return t.distribute(stub, args)
-	} else if function == "withdrawFromFoundation" {
-		return t.withdrawFromFoundation(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 	return shim.Error("Received unknown function invocation")
@@ -163,6 +171,69 @@ func (t *CoinChain) transfer(stub shim.ChaincodeStubInterface, args []string) pb
 	}
 
 	balancesMap[currentUserAccount] -= amount
+	balancesMap[receiverAccount] += amount
+
+	t.saveMap(stub, balancesKey, balancesMap)
+
+	return shim.Success([]byte(strconv.FormatUint(uint64(balancesMap[receiverAccount]), 10)))
+}
+
+func (t *CoinChain) transferFrom(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+
+	/* args
+		0 - sender account type (user_ , foundation_)
+		1 - sender ID
+		2 - receiver account type (user_ , foundation_)
+		3 - receiver ID
+		4 - amount
+	*/
+
+	if getBaseChaincodeName(stub) != "foundation" {
+		return shim.Error("Only \"foundation\" chaincode allowed to invoke transferFrom method")
+	}
+
+	if len(args) != 5 {
+		return shim.Error("Incorrect number of arguments. Expecting 5")
+	}
+
+	senderAccountType := args[0]
+	logger.Info("sender account type ", senderAccountType)
+	sender := args[1]
+	logger.Info("sender ", sender)
+
+	receiverAccountType := args[2]
+	logger.Info("receiver account type ", receiverAccountType)
+	receiver := args[3]
+	logger.Info("receiver ", receiver)
+
+	logger.Info("amount args[4] ", args[4])
+	amount := t.parseAmountUint(args[4])
+	logger.Info("amount ", amount)
+
+
+	if amount == 0 {
+		return shim.Error("Incorrect amount")
+	}
+
+	senderAccount, err := stub.CreateCompositeKey(senderAccountType, []string{sender})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	logger.Info("senderAccount ", senderAccount)
+
+	receiverAccount, err := stub.CreateCompositeKey(receiverAccountType, []string{receiver})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	logger.Info("receiverAccount ", receiverAccount)
+
+	balancesMap := t.getTransactionBalancesMap(stub)
+
+	if balancesMap[senderAccount] < amount {
+		return shim.Error("Not enough coins")
+	}
+
+	balancesMap[senderAccount] -= amount
 	balancesMap[receiverAccount] += amount
 
 	t.saveMap(stub, balancesKey, balancesMap)
@@ -329,13 +400,13 @@ func (t *CoinChain) distribute(stub shim.ChaincodeStubInterface, args []string) 
 		return shim.Error("Not enough coins")
 	}
 
-	mean := amount/uint(len(accounts))
-	logger.Warning("mean ", mean)
+	mean := uint(amount/uint(len(accounts)))
+	logger.Info("mean ", mean)
 
 	var i uint = 0
-	logger.Warning("uint(len(accounts)) ", uint(len(accounts)))
+	logger.Info("uint(len(accounts)) ", uint(len(accounts)))
 	for i < uint(len(accounts)) {
-		logger.Warning("i ", i)
+		logger.Info("i ", i)
 
 		receiverAccount, err := stub.CreateCompositeKey(userAccountType, []string{accounts[i]})
 		if err != nil {
@@ -344,10 +415,10 @@ func (t *CoinChain) distribute(stub shim.ChaincodeStubInterface, args []string) 
 		logger.Info("receiverAccount ", receiverAccount)
 
 		balancesMap[currentUserAccount] -= mean
-		logger.Warning("balancesMap[currentUserAccount} ", balancesMap[currentUserAccount])
-		logger.Warning("receiverAccount ", receiverAccount)
+		logger.Info("balancesMap[currentUserAccount} ", balancesMap[currentUserAccount])
+		logger.Info("receiverAccount ", receiverAccount)
 		balancesMap[receiverAccount] += mean
-		logger.Warning("balancesMap[receiverAccount] ", balancesMap[receiverAccount])
+		logger.Info("balancesMap[receiverAccount] ", balancesMap[receiverAccount])
 		i += 1
 	}
 	t.saveMap(stub, balancesKey,balancesMap)
@@ -374,80 +445,6 @@ func (t *CoinChain) balanceOf(stub shim.ChaincodeStubInterface, args []string) p
 	return shim.Success([]byte(fmt.Sprintf("%d", balancesMap[account])))
 }
 
-func (t *CoinChain) withdrawFromFoundation(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-
-	/* args
-		0 - foundation chaincode
-		1 - foundation name
-		2 - receiver ID
-		3 - amount
-		4 - notes
-	*/
-
-	if len(args) != 5 {
-		return shim.Error("Incorrect number of arguments. Expecting 5.")
-	}
-
-	foundationChaincode := args[0]
-	foundationName := args[1]
-	receiver := args[2]
-	amountString := args[3]
-	notes := args[4]
-
-	logger.Info("<<< invoked withdrawFromFoundation - foundationName: ", foundationName)
-
-	logger.Info("foundation Chaincode: ", foundationChaincode)
-	logger.Info("foundation Name: ", foundationName)
-	logger.Info("receiver: ", receiver)
-	logger.Info("amount: ", amountString)
-	logger.Info("notes: ", notes)
-
-	queryArgs := util.ToChaincodeArgs("isWithdrawAllowed", foundationName, amountString, notes)
-	logger.Infof("queryArgs: %x ", queryArgs)
-	response := stub.InvokeChaincode(foundationChaincode, queryArgs, channelName)
-
-	logger.Infof("isWithdrawAllowed response: %x", response)
-
-	if response.Status == shim.OK {
-		result, err := strconv.ParseBool(fmt.Sprintf("%s", response.Payload))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		logger.Info("isWithdrawAllowed result ", result)
-
-		if !result {
-			return shim.Error("Failed. Withdrawal is not allowed")
-		}
-
-		foundationAccount, err := stub.CreateCompositeKey(foundationAccountType, []string{foundationName})
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-
-		receiverAccount, err := stub.CreateCompositeKey(userAccountType, []string{receiver})
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-
-		amount := t.parseAmountUint(amountString)
-		balancesMap := t.getMap(stub, balancesKey)
-
-		if balancesMap[foundationAccount] < amount {
-			logger.Error("Not enough funds. Withdaraw failed: ", amount)
-			return shim.Error("Failed withdraw: Not enough funds")
-		} else {
-			balancesMap[foundationAccount] -= amount
-			balancesMap[receiverAccount] += amount
-			t.saveMap(stub, balancesKey, balancesMap)
-			logger.Info("withdraw success: ", amount)
-			logger.Info("foundationAccount: ", balancesMap[foundationAccount])
-			return shim.Success([]byte(strconv.FormatUint(uint64(balancesMap[foundationAccount]), 10)))
-		}
-	} else {
-		return shim.Error(response.Message)
-	}
-}
-
 func getCurrentUserId(stub shim.ChaincodeStubInterface) (string, error) {
 
 	var userId string
@@ -471,6 +468,47 @@ func getCurrentUserId(stub shim.ChaincodeStubInterface) (string, error) {
 	logger.Infof("---- UserID: %v ", userId)
 	return userId, err
 }
+
+func getBaseChaincodeName(stub shim.ChaincodeStubInterface) string {
+
+	sp, err := stub.GetSignedProposal()
+	logger.Infof("sp %s", sp)
+
+	proposal, err := utils.GetProposal(sp.ProposalBytes)
+	if err != nil {
+		logger.Error("err ", err)
+	}
+
+	header, err := utils.GetHeader(proposal.GetHeader())
+	if err != nil {
+		logger.Error("err ", err)
+	}
+	//logger.Info("header ", header)
+
+	ext, err := utils.GetChaincodeHeaderExtension(header)
+	if err != nil {
+		logger.Error("err ", err)
+	}
+	logger.Info("ext.ChaincodeId.Name ", ext.ChaincodeId.Name)
+	return ext.ChaincodeId.Name
+}
+
+func (t *CoinChain) getTransactionBalancesMap (stub shim.ChaincodeStubInterface) (map[string]uint) {
+
+	txId := stub.GetTxID()
+
+	logger.Info("lastTxId ", lastTxId)
+	logger.Info("txId ", txId)
+
+	if txId == lastTxId {
+		return txBalancesMap
+	} else {
+		txBalancesMap = t.getMap(stub, balancesKey)
+		lastTxId = txId
+	}
+	return txBalancesMap
+}
+
 
 func (t *CoinChain) parseAmountUint(amount string) uint {
 	amount32, err := strconv.ParseUint(amount, 10, 32)
