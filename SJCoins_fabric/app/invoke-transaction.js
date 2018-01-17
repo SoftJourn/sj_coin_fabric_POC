@@ -70,7 +70,11 @@ var invokeChaincode = function(peersUrls, channelName, chaincodeName, fcn, args,
 			all_good = all_good & one_good;
 		}
 		if (all_good) {
-		    payload = util.format("%s", proposalResponses[0].response.payload);
+
+			if (proposalResponses[0].response.payload.length > 0) {
+                payload = JSON.parse(proposalResponses[0].response.payload);
+			}
+
 			logger.debug(util.format(
 				'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s", metadata - "%s", endorsement signature: %s',
 				proposalResponses[0].response.status, proposalResponses[0].response.message,
