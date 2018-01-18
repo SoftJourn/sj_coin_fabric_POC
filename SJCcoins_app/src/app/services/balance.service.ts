@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {DataService} from "./data.service";
 import {
   Http,
@@ -6,15 +6,14 @@ import {
   RequestOptions,
   Headers
 } from '@angular/http';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class BalanceService {
 
-  constructor(private http: Http, private data: DataService) {
-  }
+  constructor(private http: Http, private data:DataService) { }
 
-  getBalance(formData: string) {
+  getBalance(formData:string) {
     let headers: Headers = new Headers();
     headers.append('Content-Type', 'application/json');
     headers.append('Authorization', this.data.user.token);
@@ -25,7 +24,7 @@ export class BalanceService {
     let dataObject = Object(formData);
     let argsObject = {
       fcn: "balanceOf",
-      peers: this.data.channel.peers.split(", "),
+      peers: environment.peers,
       args: [dataObject.balanceOf]
     };
 
@@ -46,8 +45,10 @@ export class BalanceService {
     let opts: RequestOptions = new RequestOptions();
     opts.headers = headers;
 
+    let lastResult = JSON.parse(this.data.chaincode.lastResult);
+
     let url = environment.apiUrl + 'channels/' + this.data.channel.currentChannel + '/transactions/' +
-      this.data.chaincode.lastResult + "?peer=peer1";
+      lastResult.transactionID + "?peer=peer1";
 
     this.http.get(url, opts)
       .subscribe((res: Response) => {

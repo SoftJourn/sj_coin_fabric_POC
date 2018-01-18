@@ -25,7 +25,7 @@ export class MintService {
     let dataObject = Object(formData);
     let argsObject = {
       fcn: "mint",
-      peers:  this.data.channel.peers.split(", "),
+      peers: environment.peers,
       args: [dataObject.amount.toString()]
     }
 

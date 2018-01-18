@@ -22,7 +22,7 @@ export class ChaincodeService {
     opts.headers = headers;
 
     let dataObject = Object(formData);
-    dataObject.peers = this.data.channel.peers.split(", ")
+    dataObject.peers = environment.peers
 
     let url = environment.apiUrl + 'chaincodes';
 
@@ -47,7 +47,7 @@ export class ChaincodeService {
     opts.headers = headers;
 
     let dataObject = {
-      peers: ["localhost:7051"],
+      peers: environment.peers,
       chaincodeName: this.data.chaincode.chaincodeName,
       chaincodeVersion: this.data.chaincode.chaincodeVersion,
       functionName: "init",
@@ -78,7 +78,7 @@ export class ChaincodeService {
     opts.headers = headers;
 
     let dataObject = {
-      peers: ["localhost:7051"],
+      peers: environment.peers,
       chaincodeName: this.data.chaincode.chaincodeName,
       chaincodeVersion: this.data.chaincode.chaincodeVersion,
       functionName: "init",
@@ -101,6 +101,9 @@ export class ChaincodeService {
     let headers: Headers = new Headers();
     headers.append('Content-Type', 'application/json');
     headers.append('Authorization', this.data.user.token);
+
+    console.log(this.data.user.username);
+    console.log(this.data.user.orgName);
 
     let opts: RequestOptions = new RequestOptions();
     opts.headers = headers;

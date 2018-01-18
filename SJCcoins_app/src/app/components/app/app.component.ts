@@ -13,7 +13,7 @@ export class AppComponent {
   title = 'SJ Coins fabric application';
 
   public username: string = "Jim";
-  public orgName: string = "org1";
+  public orgName: string = "coins";
   userForm: FormGroup;
 
   constructor(private userService: UserService, fb: FormBuilder, public data:DataService) {

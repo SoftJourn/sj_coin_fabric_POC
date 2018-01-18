@@ -3,10 +3,10 @@
    "port":"4000",
    "jwt_expiretime": "36000",
    "channelName":"mychannel",
-   "GOPATH":"../fixtures",
+   "GOPATH":"../artifacts",
    "keyValueStore":"/tmp/fabric-client-kvs",
    "eventWaitTime":"30000",
-   "orderer":"grpcs://orderer.example.com:7050",
+   "orderer":"grpc://orderer.sjfabric.softjourn.if.ua:7050",
    "users":[
       {
          "username":"admin",

@@ -22,7 +22,7 @@ export class ChannelService {
     let opts: RequestOptions = new RequestOptions();
     opts.headers = headers;
 
-    let url = environment.apiUrl + 'channels?peer=' + this.data.channel.peers;
+    let url = environment.apiUrl + 'channels?peer=peer1';
 
     this.http.get(url, opts)
       .subscribe((res: Response) => {
@@ -51,7 +51,7 @@ export class ChannelService {
 
     let url = environment.apiUrl + 'channels';
 
-    this.http.post(url, JSON.stringify({channelName: "mychannel", channelConfigPath: "../fixtures/channel/mychannel.tx"}), opts)
+    this.http.post(url, JSON.stringify({channelName: "mychannel", channelConfigPath: "../artifacts/channel/channel.tx"}), opts)
       .subscribe((res: Response) => {
         let json = res.json();
         console.log(json);

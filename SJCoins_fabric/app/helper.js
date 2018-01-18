@@ -37,7 +37,7 @@ var caClients = {};
 
 // set up the client and channel objects for each org
 for (let key in ORGS) {
-	if (key.indexOf('org') === 0) {
+	if (key.indexOf('coins') === 0) {
 		let client = new hfc();
 
 		let cryptoSuite = hfc.newCryptoSuite();
@@ -112,7 +112,7 @@ function newRemotes(urls, forPeers, userOrg) {
 
 		let found = false;
 		for (let key in ORGS) {
-			if (key.indexOf('org') === 0) {
+			if (key.indexOf('coins') === 0) {
 				// if looking for event hubs, an app can only connect to
 				// event hubs in its own org
 				if (!forPeers && key !== userOrg) {
@@ -128,7 +128,7 @@ function newRemotes(urls, forPeers, userOrg) {
 							// found a peer matching the subject url
 							if (forPeers) {
 								let data = fs.readFileSync(path.join(__dirname, org[prop]['tls_cacerts']));
-								targets.push(client.newPeer('grpcs://' + peerUrl, {
+								targets.push(client.newPeer('grpc://' + peerUrl, {
 									pem: Buffer.from(data).toString(),
 									'ssl-target-name-override': org[prop]['server-hostname']
 								}));
@@ -245,7 +245,7 @@ var getRegisteredUsers = function(username, userOrg, isJson) {
 					member = adminUserObj;
 					return caClient.register({
 						enrollmentID: username,
-						affiliation: userOrg + '.department1'
+						affiliation: userOrg
 					}, member);
 				}).then((secret) => {
 					enrollmentSecret = secret;
@@ -336,7 +336,7 @@ var getLogger = function(moduleName) {
 
 var getPeerAddressByName = function(org, peer) {
 	var address = ORGS[org][peer].requests;
-	return address.split('grpcs://')[1];
+	return address.split('grpc://')[1];
 };
 
 exports.getChannelForOrg = getChannelForOrg;

@@ -5,5 +5,5 @@ export class ChannelModel {
   readyToCreate:boolean;
   readyToConnect:boolean;
   isConnected:boolean;
-  peers:string = "peer0.org1.example.com:7051"; //v1.0.3
+  peers:string = "peer0.coins.sjfabric.softjourn.if.ua:7051";
 }

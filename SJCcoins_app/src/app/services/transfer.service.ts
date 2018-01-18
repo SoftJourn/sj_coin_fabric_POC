@@ -23,7 +23,7 @@ export class TransferService {
     let dataObject = Object(formData);
     let argsObject = {
       fcn: "transfer",
-      peers:  this.data.channel.peers.split(", "),
+      peers:  environment.peers,
       args: ["user_", dataObject.transferTo, dataObject.amount.toString()]
     };
 
