@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve -H 0.0.0.0 --public-host http://sjfabric.softjourn.if.ua",
+    "start": "ng serve -H 0.0.0.0 --port 4200 --public-host sjfabric.softjourn.if.ua:4200",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
