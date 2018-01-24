@@ -5,6 +5,6 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://sjfabric.softjourn.if.ua:4000/',
+  apiUrl: 'https://sjfabric.softjourn.if.ua:4001/',
   peers: ["peer0.coins.sjfabric.softjourn.if.ua:7051"]
 }
