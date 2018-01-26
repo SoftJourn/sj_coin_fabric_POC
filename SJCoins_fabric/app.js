@@ -113,6 +113,7 @@ app.post('/users', function(req, res) {
 	logger.debug('End point : /users');
 	logger.debug('User name : ' + username);
 	logger.debug('Org name  : ' + orgName);
+    logger.debug('>>> Request  : ' + req);
 	if (!username) {
 		res.json(getErrorMessage('\'username\''));
 		return;
@@ -137,6 +138,7 @@ app.post('/users', function(req, res) {
 			});
 		}
 	});
+    logger.debug('<<< Response  : ' + res);
 });
 // Create Channel
 app.post('/channels', function(req, res) {
@@ -316,6 +318,9 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) 
 	logger.debug('chaincodeName : ' + chaincodeName);
 	logger.debug('fcn  : ' + fcn);
 	logger.debug('args  : ' + args);
+
+    logger.debug('>>> Request  : ' + req);
+
 	if (!peers || peers.length == 0) {
 		res.json(getErrorMessage('\'peers\''));
 		return;
@@ -341,6 +346,9 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) 
 	.then(function(message) {
 		res.send(message);
 	});
+
+    logger.debug('<<< Response : ' + res);
+
 });
 // Query on chaincode on target peers
 app.get('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {

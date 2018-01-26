@@ -4,7 +4,7 @@ COPY package.json /app
 RUN npm install
 COPY . /app
 
-RUN mkdir -p "/tmp/fabric-client-kvs_peerCoins" && chmod -R 777 "/tmp"
+RUN mkdir -p "/app_data/fabric-client-kvs_peerCoins1" && chmod -R 777 "/app_data"
 
 ENTRYPOINT node app.js
 EXPOSE 4000
